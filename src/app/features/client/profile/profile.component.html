@@ -1,0 +1,68 @@
+<header class="page-header">
+  <div>
+    <h1>الملف الشخصي</h1>
+    <p>تفاصيل حسابك وخصوصية بياناتك.</p>
+  </div>
+</header>
+@if (session.account(); as account) {
+  <div class="profile-layout">
+    <section class="card">
+      <div class="actions">
+        <h2>{{ account.fullName }}</h2>
+        <app-status-badge [status]="account.status" />
+      </div>
+      <dl>
+        <dt>البريد الإلكتروني</dt>
+        <dd>
+          <bdi>{{ account.email }}</bdi>
+        </dd>
+        <dt>واتساب</dt>
+        <dd>
+          <bdi>{{ account.whatsapp }}</bdi>
+        </dd>
+        <dt>الباقة</dt>
+        <dd>{{ account.package || '—' }}</dd>
+        <dt>انتهاء الاشتراك</dt>
+        <dd>{{ account.accessEndAt | cairoDate }}</dd>
+        <dt>تاريخ التسجيل</dt>
+        <dd>{{ account.createdAt | cairoDate }}</dd>
+      </dl>
+      <p class="caption">لتعديل بيانات حسابك، تواصل مع المدرب.</p>
+    </section>
+    <section class="card stack">
+      <h3>بياناتك وخصوصيتك</h3>
+      <p>يمكنك تنزيل نسخة من بياناتك الشخصية، وخططك، وسجل تقدمك.</p>
+      <button class="btn secondary" [disabled]="busy()" (click)="export()">تصدير بياناتي</button
+      ><a class="link" routerLink="/privacy">سياسة الخصوصية</a>
+      <hr class="divider" />
+      <h3>حذف الحساب</h3>
+      <p>سيتم حذف حسابك وبياناتك نهائياً، بما فيها صور التقدم.</p>
+      @if (deleting()) {
+        <label class="field"
+          >اكتب بريدك الإلكتروني للتأكيد<input
+            dir="ltr"
+            [(ngModel)]="confirmation"
+            type="email"
+            autocomplete="off"
+        /></label>
+        <div class="actions">
+          <button
+            class="btn"
+            [disabled]="busy() || confirmation !== account.email"
+            (click)="remove()"
+          >
+            حذف الحساب نهائياً</button
+          ><button
+            class="btn secondary"
+            [disabled]="busy()"
+            (click)="deleting.set(false); confirmation = ''"
+          >
+            إلغاء
+          </button>
+        </div>
+      } @else {
+        <button class="text-button" (click)="deleting.set(true)">طلب حذف حسابي</button>
+      }
+    </section>
+  </div>
+}

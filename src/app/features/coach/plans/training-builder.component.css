@@ -1,0 +1,222 @@
+.builder-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-block-end: 25px;
+}
+.builder-toolbar > .field {
+  width: min(400px, 100%);
+}
+.builder {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) 260px;
+  gap: 20px;
+  align-items: start;
+}
+.days,
+.library {
+  padding: 14px;
+}
+.day-button {
+  display: block;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: start;
+  color: var(--text);
+  padding: 12px;
+  width: 100%;
+  margin-block: 10px;
+}
+.day-button.active {
+  background: var(--raised);
+  border-color: var(--red);
+}
+.day-button small {
+  display: block;
+  font-size: 10px;
+}
+.day-button strong {
+  font-size: 12px;
+}
+.days .btn {
+  font-size: 10px;
+  padding: 8px;
+}
+.day-name {
+  flex: 1;
+}
+.placements {
+  display: grid;
+  gap: 10px;
+}
+.placement {
+  display: flex;
+  gap: 4px;
+  background: var(--surface);
+  border-radius: 10px;
+}
+.exercise-select {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px;
+  text-align: start;
+  color: var(--text);
+}
+.exercise-select.selected {
+  border-color: var(--red);
+}
+.exercise-select strong {
+  font-size: 12px;
+  flex: 1;
+}
+.reps {
+  font-size: 11px;
+  color: var(--red);
+  white-space: nowrap;
+}
+.drag-handle {
+  background: none;
+  color: var(--muted);
+  border: 0;
+  cursor: grab;
+  min-width: 24px;
+}
+.reorder {
+  display: grid;
+}
+.reorder button {
+  background: none;
+  color: var(--muted);
+  border: 0;
+  width: 32px;
+  min-height: 35px;
+}
+.play {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  background: var(--red);
+  border-radius: 50%;
+  font-size: 10px;
+  direction: ltr;
+  flex-shrink: 0;
+}
+.edit-placement {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+.edit-placement h3 {
+  font-size: 13px;
+}
+.edit-placement .four-columns {
+  gap: 8px;
+}
+.edit-placement input {
+  padding: 9px;
+}
+.library > h3 {
+  font-size: 13px;
+  margin-block-end: 15px;
+}
+.library .actions {
+  margin-block-end: 12px;
+}
+.library-row {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: var(--raised);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: start;
+  margin-block: 7px;
+  padding: 10px;
+  font-size: 11px;
+}
+.library-row > span:nth-child(2) {
+  flex: 1;
+}
+.library-row small {
+  display: block;
+  font-size: 9px;
+}
+.library-row > span:last-child {
+  color: var(--red);
+}
+.lock-control {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-block: 14px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.alternative {
+  display: grid;
+  grid-template-columns: minmax(80px, 1fr) 80px 80px 32px;
+  gap: 8px;
+  align-items: center;
+  background: var(--raised);
+  border-radius: 8px;
+  padding: 10px;
+}
+.alternative strong {
+  font-size: 11px;
+}
+.alt-note {
+  grid-column: 1/-1;
+}
+.cdk-drag-preview {
+  background: var(--surface);
+  border: 1px solid var(--red);
+  border-radius: 10px;
+}
+.cdk-drag-placeholder {
+  opacity: 0.2;
+}
+@media (max-width: 1250px) {
+  .builder {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+  .library {
+    grid-column: 2;
+  }
+  .builder-toolbar {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 800px) {
+  .builder {
+    grid-template-columns: 1fr;
+  }
+  .days {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .day-button {
+    width: auto;
+    min-width: 90px;
+  }
+  .library {
+    grid-column: auto;
+  }
+  .builder-toolbar .actions {
+    width: 100%;
+  }
+  .alternative {
+    grid-template-columns: 1fr 65px 65px 30px;
+  }
+}

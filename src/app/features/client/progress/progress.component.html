@@ -1,0 +1,152 @@
+<header class="page-header">
+  <div>
+    <span class="eyebrow">كل خطوة تصنع فارقاً</span>
+    <h1>تقدمك</h1>
+  </div>
+  <button class="btn" (click)="checkIn()">تسجيل المتابعة</button>
+</header>
+@if (loading()) {
+  <p class="empty" role="status">جارٍ تحميل تقدمك…</p>
+} @else if (error()) {
+  <div class="empty">
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+  </div>
+} @else {
+  <div class="four-columns">
+    <app-stat-card label="وزن الجسم" [value]="latest()?.weight ?? '—'" unit="كجم" /><app-stat-card
+      label="نسبة الدهون"
+      [value]="latest()?.measurements?.['bodyFat'] ?? '—'"
+      unit="%"
+    /><app-stat-card
+      label="الخصر"
+      [value]="latest()?.measurements?.['waist'] ?? '—'"
+      unit="سم"
+    /><app-stat-card label="التمارين المنجزة" [value]="workouts()" unit="تمرين" />
+  </div>
+  <div class="progress-layout">
+    <div class="stack">
+      <section class="card">
+        <div class="chart-header">
+          <h3>تغير القياسات</h3>
+          <div class="pills">
+            @for (
+              item of [
+                { key: 'weight', name: 'الوزن' },
+                { key: 'waist', name: 'الخصر' },
+                { key: 'chest', name: 'الصدر' },
+              ];
+              track item.key
+            ) {
+              <button
+                class="pill"
+                [class.active]="metric() === item.key"
+                (click)="metric.set(item.key)"
+              >
+                {{ item.name }}
+              </button>
+            }
+          </div>
+        </div>
+        <app-progress-chart [values]="values()" />
+        <p class="caption muted">
+          من الأقدم إلى الأحدث · آخر {{ data()?.items?.length || 0 }} متابعة
+        </p>
+      </section>
+      <div class="four-columns">
+        <app-stat-card
+          label="الصدر"
+          [value]="latest()?.measurements?.['chest'] ?? '—'"
+          unit="سم"
+        /><app-stat-card
+          label="الذراع"
+          [value]="latest()?.measurements?.['arms'] ?? '—'"
+          unit="سم"
+        /><app-stat-card
+          label="الفخذ"
+          [value]="latest()?.measurements?.['thighs'] ?? '—'"
+          unit="سم"
+        />
+        <app-stat-card
+          label="الأرداف"
+          [value]="latest()?.measurements?.['hips'] ?? '—'"
+          unit="سم"
+        />
+      </div>
+      <section class="card">
+        <h3>سجل المتابعات</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>التاريخ</th>
+                <th>الوزن</th>
+                <th>الخصر</th>
+                <th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of data()?.items; track item.id) {
+                <tr>
+                  <td>{{ item.recordedAt | cairoDate }}</td>
+                  <td>{{ item.weight }} كجم</td>
+                  <td>{{ item.measurements['waist'] ?? '—' }} سم</td>
+                  <td class="note-cell">{{ item.notes || '—' }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4">لم تسجل متابعات بعد.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <button
+            class="btn secondary"
+            [disabled]="!data() || data()!.page <= 1"
+            (click)="load(data()!.page - 1)"
+          >
+            السابق</button
+          ><span>{{ data()?.page }}</span
+          ><button
+            class="btn secondary"
+            [disabled]="!data() || data()!.page * data()!.pageSize >= data()!.total"
+            (click)="load(data()!.page + 1)"
+          >
+            التالي
+          </button>
+        </div>
+      </section>
+    </div>
+    <aside class="stack">
+      <section class="card">
+        <span class="eyebrow">المتابعة الأسبوعية</span>
+        <h3>نراجع تقدمك معاً</h3>
+        <p>أرسل وزنك وقياساتك وصورك لنطوّر خطتك.</p>
+        <button class="btn full" (click)="checkIn()">تسجيل المتابعة</button>
+      </section>
+      <section class="card">
+        <h3>صور التقدم</h3>
+        <p class="caption">الصور خاصة. تُحمّل بروابط مؤقتة.</p>
+        <button class="text-button" (click)="viewPhotos()" [disabled]="photoBusy()">
+          {{ photoBusy() ? 'جارٍ التحميل…' : 'عرض الصور / تحديث الروابط' }}
+        </button>
+        <div class="photos">
+          @for (photo of photos(); track photo.id) {
+            <a [href]="photo.url" target="_blank" rel="noopener noreferrer"
+              ><img [src]="photo.url" alt="صورة التقدم" loading="lazy" referrerpolicy="no-referrer"
+            /></a>
+          }
+        </div>
+        @if (!photos().length) {
+          <p class="caption muted">ستظهر صور المتابعة هنا عند توفرها.</p>
+        }
+      </section>
+      <section class="card">
+        <span class="eyebrow">ملاحظات المدرب</span>
+        <p>{{ latest()?.feedback || 'ستظهر ملاحظات المدرب هنا بعد مراجعة متابعتك.' }}</p>
+      </section>
+    </aside>
+  </div>
+}

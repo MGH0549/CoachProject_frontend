@@ -1,0 +1,11 @@
+<div class="card stat">
+  <small>{{ label() }}</small>
+  <div>
+    <strong
+      ><bdi>{{ value() }}</bdi></strong
+    ><span>{{ unit() }}</span>
+  </div>
+  @if (detail()) {
+    <p>{{ detail() }}</p>
+  }
+</div>

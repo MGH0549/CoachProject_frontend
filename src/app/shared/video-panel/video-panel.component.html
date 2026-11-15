@@ -1,0 +1,21 @@
+<div class="video">
+  @if (playing() && source()) {
+    <iframe
+      [src]="source()"
+      [title]="title()"
+      allow="autoplay; encrypted-media; picture-in-picture"
+      referrerpolicy="strict-origin-when-cross-origin"
+      allowfullscreen
+    ></iframe>
+  } @else {
+    <button
+      type="button"
+      [disabled]="!valid()"
+      (click)="playing.set(true)"
+      [attr.aria-label]="'تشغيل ' + title()"
+    >
+      <span class="play" aria-hidden="true">▶</span
+      ><small>{{ valid() ? title() : 'الفيديو غير متاح' }}</small>
+    </button>
+  }
+</div>

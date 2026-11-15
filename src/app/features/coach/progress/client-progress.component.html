@@ -1,0 +1,77 @@
+@if (loading()) {
+  <p class="empty">جارٍ تحميل المتابعات…</p>
+} @else if (error()) {
+  <div class="empty">
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+  </div>
+} @else {
+  <section class="card chart">
+    <h3>وزن الجسم · كجم</h3>
+    <app-progress-chart [values]="values()" />
+  </section>
+  <div class="history">
+    @for (item of data()?.items; track item.id) {
+      <section class="card check-in">
+        <header>
+          <h3>{{ item.recordedAt | cairoDate }}</h3>
+          <strong>{{ item.weight }} كجم</strong>
+        </header>
+        <p class="caption">
+          الطاقة: {{ item.energy }} / 5 · الخصر: {{ item.measurements['waist'] ?? '—' }} سم · الصدر:
+          {{ item.measurements['chest'] ?? '—' }} سم
+        </p>
+        <p>{{ item.notes || 'بدون ملاحظات' }}</p>
+        @if (item.photos.length) {
+          <button class="text-button" [disabled]="busy()" (click)="showPhotos(item)">
+            عرض صور المتابعة / تحديث الروابط
+          </button>
+          <div class="photos">
+            @for (photo of item.photos; track photo.id) {
+              @if (photos()[photo.id]) {
+                <a [href]="photos()[photo.id]" target="_blank" rel="noopener noreferrer"
+                  ><img
+                    [src]="photos()[photo.id]"
+                    alt="صورة تقدم العميل"
+                    loading="lazy"
+                    referrerpolicy="no-referrer"
+                /></a>
+              }
+            }
+          </div>
+        }
+        <label class="field"
+          >ملاحظات المدرب<textarea
+            [ngModel]="feedback()[item.id]"
+            (ngModelChange)="edit(item.id, $event)"
+            maxlength="3000"
+          ></textarea></label
+        ><button
+          class="btn"
+          [disabled]="busy() || !feedback()[item.id]?.trim()"
+          (click)="save(item)"
+        >
+          حفظ الملاحظات
+        </button>
+      </section>
+    } @empty {
+      <p class="empty">لم يرسل العميل متابعات بعد.</p>
+    }
+  </div>
+  <div class="pager">
+    <button
+      class="btn secondary"
+      [disabled]="!data() || data()!.page <= 1"
+      (click)="load(data()!.page - 1)"
+    >
+      السابق</button
+    ><span>{{ data()?.page }}</span
+    ><button
+      class="btn secondary"
+      [disabled]="!data() || data()!.page * data()!.pageSize >= data()!.total"
+      (click)="load(data()!.page + 1)"
+    >
+      التالي
+    </button>
+  </div>
+}

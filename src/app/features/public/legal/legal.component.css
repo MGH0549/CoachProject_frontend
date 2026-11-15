@@ -1,0 +1,24 @@
+.legal {
+  max-width: 900px;
+  padding: 30px 24px 70px;
+  margin: auto;
+}
+.back {
+  display: block;
+  color: var(--muted);
+  margin-block: 20px;
+}
+.legal main {
+  padding: 35px;
+}
+.legal section {
+  margin-block-start: 25px;
+}
+.legal h2 {
+  font-size: 18px;
+  margin-block-end: 10px;
+}
+.legal p {
+  line-height: 2;
+  font-size: 13px;
+}

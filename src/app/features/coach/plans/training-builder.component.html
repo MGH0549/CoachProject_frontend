@@ -1,0 +1,216 @@
+<div class="builder-toolbar">
+  <label class="field"
+    >اسم الخطة<input
+      [(ngModel)]="draft().name"
+      (ngModelChange)="change()"
+      placeholder="اسم الخطة التدريبية"
+  /></label>
+  <div class="actions">
+    <button class="btn secondary" [disabled]="busy() || loading()" (click)="reload()">
+      إعادة تحميل
+    </button>
+    <button class="btn secondary" [disabled]="busy()" (click)="save(true)">حفظ كقالب</button
+    ><button class="btn" [disabled]="busy() || loading()" (click)="save()">
+      {{ busy() ? 'جارٍ الحفظ…' : 'حفظ الخطة' }}
+    </button>
+  </div>
+</div>
+@if (error()) {
+  <div class="empty">
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+  </div>
+} @else if (loading()) {
+  <p class="empty">جارٍ تحميل الخطة…</p>
+} @else {
+  <div class="builder">
+    <aside class="card days">
+      <span class="eyebrow">أيام التدريب</span>
+      @for (dayItem of draft().days; track $index; let index = $index) {
+        <button
+          class="day-button"
+          [class.active]="dayIndex() === index"
+          (click)="dayIndex.set(index); exerciseIndex.set(0)"
+        >
+          <strong>{{ dayItem.name }}</strong><small>{{ dayItem.exercises.length }} تمارين</small>
+        </button>
+      }
+      <button class="btn secondary full" (click)="addDay()">+ إضافة يوم</button>
+      @if (!templateMode() && original()) {
+        <label class="lock-control"
+          ><input
+            type="checkbox"
+            [checked]="original()?.choicesLocked"
+            [disabled]="busy() || dirty()"
+            (change)="lock($any($event.target).checked)"
+          />قفل جميع البدائل</label
+        >
+      }
+      @if (dirty()) {
+        <p class="caption muted">احفظ تغييراتك قبل تعديل الأقفال.</p>
+      }
+    </aside>
+    <div class="stack">
+      @if (day) {
+        <div class="actions">
+          <label class="field day-name"
+            >اسم اليوم<input [(ngModel)]="day.name" (ngModelChange)="change()" /></label
+          ><button class="text-button" (click)="removeDay()">حذف اليوم</button>
+        </div>
+        <div
+          class="placements"
+          cdkDropList
+          [cdkDropListData]="day.exercises"
+          (cdkDropListDropped)="drop($event)"
+        >
+          @for (item of day.exercises; track item; let index = $index) {
+            <div class="placement" cdkDrag>
+              <button class="drag-handle" cdkDragHandle aria-label="اسحب لإعادة ترتيب التمرين">
+                ⠿</button
+              ><button
+                class="exercise-select"
+                [class.selected]="exerciseIndex() === index"
+                (click)="exerciseIndex.set(index)"
+              >
+                <span class="play" aria-hidden="true">▶</span
+                ><strong
+                  ><bdi>{{ name(item.exerciseId) }}</bdi></strong
+                ><span class="reps">{{ item.sets }} × {{ item.reps }}</span>
+              </button>
+              <div class="reorder">
+                <button [disabled]="index === 0" (click)="move(index, -1)" aria-label="نقل لأعلى">
+                  ↑</button
+                ><button
+                  [disabled]="index === day.exercises.length - 1"
+                  (click)="move(index, 1)"
+                  aria-label="نقل لأسفل"
+                >
+                  ↓
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <p class="empty">اختر تمريناً من المكتبة لإضافته.</p>
+          }
+        </div>
+        @if (placement; as item) {
+          <section class="card edit-placement">
+            <h3>تعديل · {{ name(item.exerciseId) }}</h3>
+            <div class="four-columns">
+              <label class="field"
+                >المجموعات<input
+                  type="number"
+                  min="1"
+                  [(ngModel)]="item.sets"
+                  (ngModelChange)="change()" /></label
+              ><label class="field"
+                >التكرارات<input [(ngModel)]="item.reps" (ngModelChange)="change()" /></label
+              ><label class="field"
+                >الراحة (ث)<input
+                  type="number"
+                  min="0"
+                  [(ngModel)]="item.restSeconds"
+                  (ngModelChange)="change()" /></label
+              ><label class="field"
+                >الإيقاع<input
+                  [(ngModel)]="item.tempo"
+                  (ngModelChange)="change()"
+                  placeholder="2-0-1"
+              /></label>
+            </div>
+            <label class="field"
+              >ملاحظة للعميل<textarea [(ngModel)]="item.note" (ngModelChange)="change()"></textarea>
+            </label>
+            <h3>البدائل</h3>
+            @for (alt of item.alternatives; track alt; let index = $index) {
+              <div class="alternative">
+                <strong>{{ name(alt.exerciseId) }}</strong><label class="field"
+                  >مجموعات<input
+                    type="number"
+                    min="1"
+                    [(ngModel)]="alt.sets"
+                    (ngModelChange)="change()"
+                    [placeholder]="'' + item.sets" /></label
+                ><label class="field"
+                  >تكرارات<input
+                    [(ngModel)]="alt.reps"
+                    (ngModelChange)="change()"
+                    [placeholder]="item.reps" /></label
+                ><button
+                  class="text-button"
+                  (click)="item.alternatives.splice(index, 1); change()"
+                  aria-label="حذف البديل"
+                >
+                  ×</button
+                ><label class="field alt-note"
+                  >ملاحظة البديل<input [(ngModel)]="alt.note" (ngModelChange)="change()"
+                /></label>
+              </div>
+            }
+            <label class="field"
+              >إضافة بديل من المكتبة<select
+                #alternativeSelect
+                (change)="addAlternative(alternativeSelect.value); alternativeSelect.value = ''"
+              >
+                <option value="">اختر تمريناً</option>
+                @for (exercise of library(); track exercise.id) {
+                  <option [value]="exercise.id">{{ exercise.name }}</option>
+                }
+              </select></label
+            >
+            @if (!templateMode() && original()) {
+              <label class="lock-control"
+                ><input
+                  type="checkbox"
+                  [checked]="placementLocked"
+                  [disabled]="busy() || dirty()"
+                  (change)="lockPlacement($any($event.target).checked)"
+                />قفل بدائل هذا التمرين</label
+              >
+            }
+            <button class="text-button" (click)="removeExercise()">حذف التمرين من اليوم</button>
+          </section>
+        }
+      } @else {
+        <p class="empty">أضف يوماً لتبدأ بناء الخطة.</p>
+      }
+    </div>
+    <aside class="card library">
+      <h3>مكتبة التمارين</h3>
+      <form class="actions" (ngSubmit)="loadLibrary()">
+        <label class="sr-only" for="builder-search">ابحث عن تمرين</label
+        ><input
+          id="builder-search"
+          [(ngModel)]="search"
+          name="search"
+          placeholder="ابحث عن تمرين…"
+        /><button class="btn secondary">بحث</button>
+      </form>
+      @for (exercise of library(); track exercise.id) {
+        <button class="library-row" (click)="add(exercise)">
+          <span class="play">▶</span
+          ><span
+            ><bdi>{{ exercise.name }}</bdi
+            ><small>{{ exercise.muscleGroup }}</small></span
+          ><span>+</span>
+        </button>
+      }
+      <div class="pager">
+        <button
+          class="text-button"
+          [disabled]="libraryPage() <= 1"
+          (click)="loadLibrary(libraryPage() - 1)"
+        >
+          السابق</button
+        ><span>{{ libraryPage() }}</span
+        ><button
+          class="text-button"
+          [disabled]="libraryPage() * 24 >= libraryTotal()"
+          (click)="loadLibrary(libraryPage() + 1)"
+        >
+          التالي
+        </button>
+      </div>
+    </aside>
+  </div>
+}

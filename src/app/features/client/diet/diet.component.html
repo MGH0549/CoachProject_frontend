@@ -1,0 +1,53 @@
+<div class="diet">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">تغذيتك، جزء من تقدمك</span>
+      <h1>النظام الغذائي</h1>
+      <p>اختر الوجبة المناسبة لك. كل خيار محسوب بواسطة مدربك.</p>
+    </div>
+  </header>
+  @if (loading()) {
+    <p class="empty" role="status">جارٍ تحميل نظامك الغذائي…</p>
+  } @else if (error()) {
+    <div class="empty">
+      <p>{{ error() }}</p>
+      <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+    </div>
+  } @else if (plan(); as plan) {
+    <div class="four-columns">
+      <app-stat-card
+        label="السعرات"
+        [value]="plan.selectedTotals?.calories ?? 0"
+        [detail]="'الهدف: ' + plan.calories"
+        unit="سعر"
+      /><app-stat-card
+        label="البروتين"
+        [value]="plan.selectedTotals?.protein ?? 0"
+        [detail]="'الهدف: ' + plan.protein"
+        unit="جم"
+      /><app-stat-card
+        label="الكربوهيدرات"
+        [value]="plan.selectedTotals?.carbs ?? 0"
+        [detail]="'الهدف: ' + plan.carbs"
+        unit="جم"
+      /><app-stat-card
+        label="الدهون"
+        [value]="plan.selectedTotals?.fat ?? 0"
+        [detail]="'الهدف: ' + plan.fat"
+        unit="جم"
+      />
+    </div>
+    <div class="meals">
+      @for (meal of plan.meals; track meal.id) {
+        <app-meal-card
+          [meal]="meal"
+          [locked]="plan.choicesLocked || !!meal.selection?.locked"
+          [busy]="busy()"
+          (choose)="choose(meal.id, $event)"
+        />
+      } @empty {
+        <p class="empty">لم يضف المدرب وجبات بعد.</p>
+      }
+    </div>
+  }
+</div>

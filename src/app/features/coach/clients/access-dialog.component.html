@@ -1,0 +1,20 @@
+<section class="dialog" dir="rtl">
+  <h2 id="access-title">{{ client.status === 'Active' ? 'تمديد الاشتراك' : 'تفعيل الحساب' }}</h2>
+  <p>{{ client.fullName }}</p>
+  <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field"
+      >الباقة<input formControlName="package" placeholder="أونلاين / هجين / شخصي" /></label
+    ><label class="field"
+      >تاريخ انتهاء الاشتراك<input type="date" formControlName="endDate" [min]="today"
+    /></label>
+    <p class="caption">ينتهي الوصول في نهاية اليوم المحدد بتوقيت القاهرة.</p>
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    <div class="actions">
+      <button class="btn secondary" type="button" [disabled]="busy()" (click)="dialog.close(false)">
+        إلغاء</button
+      ><button class="btn" [disabled]="busy()">{{ busy() ? 'جارٍ الحفظ…' : 'حفظ وتأكيد' }}</button>
+    </div>
+  </form>
+</section>

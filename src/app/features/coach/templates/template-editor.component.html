@@ -1,0 +1,9 @@
+<a class="back" routerLink="/coach/templates">› قوالب الخطط</a>
+<header class="page-header">
+  <h1>{{ id ? 'تعديل القالب' : 'قالب جديد' }}</h1>
+</header>
+@if (diet) {
+  <app-diet-builder [templateMode]="true" [templateId]="id" />
+} @else {
+  <app-training-builder [templateMode]="true" [templateId]="id" />
+}

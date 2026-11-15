@@ -1,0 +1,49 @@
+.pending-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.pending {
+  width: min(100%, 510px);
+  text-align: center;
+  padding: 40px;
+}
+.pending h1 {
+  font-size: 25px;
+  margin-block: 18px;
+}
+.pending p {
+  font-size: 13px;
+}
+.pending ol {
+  text-align: start;
+  list-style: none;
+  padding: 20px;
+  background: var(--raised);
+  border-radius: 10px;
+  margin-block: 24px;
+  display: grid;
+  gap: 13px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.pending li:before {
+  content: '○';
+  margin-inline-end: 10px;
+}
+.pending .done {
+  color: var(--text);
+}
+.pending .done:before {
+  content: '✓';
+  color: var(--red);
+}
+.pending .secondary {
+  margin-block-start: 12px;
+}
+@media (max-width: 600px) {
+  .pending {
+    padding: 24px;
+  }
+}

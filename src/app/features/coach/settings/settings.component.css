@@ -1,0 +1,22 @@
+.settings {
+  max-width: 720px;
+  display: grid;
+  gap: 16px;
+}
+.setting {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-block-end: 1px solid var(--border);
+  padding-block: 12px;
+  font-size: 12px;
+}
+.setting > span:first-child {
+  color: var(--muted);
+}
+.settings p {
+  font-size: 12px;
+}
+.divider {
+  margin-block: 5px;
+}

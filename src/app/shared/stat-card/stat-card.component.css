@@ -1,0 +1,20 @@
+.stat {
+  padding: 16px;
+  min-height: 100px;
+}
+.stat small {
+  font-size: 11px;
+}
+.stat strong {
+  font-size: 28px;
+  line-height: 1.5;
+}
+.stat span {
+  color: var(--green);
+  font-size: 11px;
+  margin-inline-start: 5px;
+}
+.stat p {
+  color: var(--green);
+  font-size: 10px;
+}

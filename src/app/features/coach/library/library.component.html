@@ -1,0 +1,110 @@
+<header class="page-header">
+  <div>
+    <h1>مكتبة التمارين</h1>
+    <p>{{ data()?.total || 0 }} تمرين · لكل تمرين فيديو يوتيوب يستطيع العميل مشاهدته.</p>
+  </div>
+  <div class="actions">
+    <form (ngSubmit)="load()" class="actions">
+      <label class="sr-only" for="exercise-search">بحث التمارين</label
+      ><input
+        id="exercise-search"
+        name="search"
+        [(ngModel)]="search"
+        placeholder="ابحث عن تمرين…"
+      /><button class="btn secondary">بحث</button>
+    </form>
+    <button class="btn" (click)="edit(null)">تمرين جديد</button>
+  </div>
+</header>
+<div class="pills">
+  <button class="pill" [class.active]="!muscle" (click)="muscle = ''; load()">الكل</button>
+  @for (item of muscles; track item) {
+    <button class="pill" [class.active]="muscle === item" (click)="muscle = item; load()">
+      {{ item }}
+    </button>
+  }
+</div>
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+}
+<div class="library-layout">
+  <div>
+    @if (loading()) {
+      <p class="empty" role="status">جارٍ تحميل التمارين…</p>
+    } @else {
+      <div class="exercise-grid">
+        @for (exercise of data()?.items; track exercise.id) {
+          <button
+            class="exercise-card card"
+            [class.selected]="selected()?.id === exercise.id"
+            (click)="edit(exercise)"
+          >
+            <div class="thumbnail"><span>▶</span></div>
+            <h3>
+              <bdi>{{ exercise.name }}</bdi>
+            </h3>
+            <small>{{ exercise.muscleGroup }}</small>
+          </button>
+        } @empty {
+          <p class="empty">لا توجد تمارين. أضف تمرينك الأول.</p>
+        }
+      </div>
+    }
+    <div class="pager">
+      <button
+        class="btn secondary"
+        [disabled]="!data() || data()!.page <= 1 || loading()"
+        (click)="load(data()!.page - 1)"
+      >
+        السابق</button
+      ><span>{{ data()?.page }}</span
+      ><button
+        class="btn secondary"
+        [disabled]="!data() || data()!.page * data()!.pageSize >= data()!.total || loading()"
+        (click)="load(data()!.page + 1)"
+      >
+        التالي
+      </button>
+    </div>
+  </div>
+  @if (editing()) {
+    <aside class="card editor">
+      <h3>{{ selected() ? 'تعديل التمرين' : 'تمرين جديد' }}</h3>
+      <form [formGroup]="form" class="form-stack" (ngSubmit)="save()">
+        <label class="field">اسم التمرين<input formControlName="name" /></label
+        ><label class="field"
+          >العضلة المستهدفة<input formControlName="muscleGroup" list="muscle-groups" /><datalist
+            id="muscle-groups"
+          >
+            @for (item of muscles; track item) {
+              <option [value]="item"></option>
+            }</datalist></label
+        ><label class="field"
+          >رابط يوتيوب<input
+            type="text"
+            dir="ltr"
+            formControlName="video"
+            placeholder="https://youtube.com/watch?v=…" /></label
+        ><app-video-panel [videoId]="preview()" [title]="form.controls.name.value" /><label
+          class="field"
+          >ملاحظات المدرب<textarea formControlName="notes"></textarea>
+        </label>
+        <div class="actions">
+          @if (selected()) {
+            <button class="btn secondary" type="button" [disabled]="busy()" (click)="archive()">
+              أرشفة
+            </button>
+          }
+          <button class="btn" [disabled]="busy()">
+            {{ busy() ? 'جارٍ الحفظ…' : 'حفظ' }}</button><button
+            class="text-button"
+            type="button"
+            (click)="editing.set(false)"
+          >
+            إغلاق
+          </button>
+        </div>
+      </form>
+    </aside>
+  }
+</div>

@@ -1,0 +1,8 @@
+node_modules
+.angular
+dist
+api/openapi.json
+src/app/core/api
+package-lock.json
+playwright-report
+test-results

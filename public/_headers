@@ -1,0 +1,11 @@
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: object-src 'none'; base-uri 'self'; frame-ancestors 'none'; frame-src https://www.youtube-nocookie.com
+/client/*
+  Cache-Control: no-store
+/coach/*
+  Cache-Control: no-store
+/auth/*
+  Cache-Control: no-store

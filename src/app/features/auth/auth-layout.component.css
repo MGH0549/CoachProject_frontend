@@ -1,0 +1,44 @@
+.auth-layout {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  min-height: 100dvh;
+}
+aside {
+  background: var(--surface);
+  padding: 38px 50px;
+  display: flex;
+  flex-direction: column;
+}
+.welcome {
+  margin-block-start: auto;
+  padding-block: 100px 30px;
+  max-width: 440px;
+}
+.welcome h1 {
+  font-size: 36px;
+  line-height: 1.4;
+  margin-block-end: 16px;
+}
+main {
+  display: grid;
+  place-items: center;
+  padding: 65px 30px;
+}
+main ::ng-deep > :not(router-outlet) {
+  width: min(100%, 390px);
+}
+@media (max-width: 700px) {
+  .auth-layout {
+    display: block;
+  }
+  aside {
+    padding: 20px 24px;
+    background: var(--bg);
+  }
+  .welcome {
+    display: none;
+  }
+  main {
+    padding: 32px 24px;
+  }
+}

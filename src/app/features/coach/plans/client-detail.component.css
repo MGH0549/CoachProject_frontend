@@ -1,0 +1,11 @@
+.back {
+  display: inline-flex;
+  color: var(--muted);
+  font-size: 12px;
+  min-height: 44px;
+  align-items: center;
+  margin-block-end: 12px;
+}
+.page-header {
+  margin-block-end: 10px;
+}

@@ -1,0 +1,11 @@
+<router-outlet />
+@if (notices.message()) {
+  <div
+    class="toast"
+    [class.error-toast]="notices.isError()"
+    [attr.role]="notices.isError() ? 'alert' : 'status'"
+  >
+    <span>{{ notices.message() }}</span>
+    <button type="button" (click)="notices.message.set('')" aria-label="إغلاق الإشعار">×</button>
+  </div>
+}

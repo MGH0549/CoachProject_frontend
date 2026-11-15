@@ -1,0 +1,35 @@
+.profile-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+dl {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 18px;
+  margin-block: 30px;
+}
+dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.card p {
+  font-size: 12px;
+}
+.stack {
+  align-items: start;
+}
+.divider {
+  width: 100%;
+  margin-block: 10px;
+}
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}

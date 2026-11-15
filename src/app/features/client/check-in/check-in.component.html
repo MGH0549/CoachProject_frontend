@@ -1,0 +1,76 @@
+<section class="dialog" dir="rtl">
+  <h2 id="check-in-title">المتابعة الأسبوعية</h2>
+  <p class="caption">أرسل قياساتك وصور تقدمك إلى المدرب.</p>
+  <form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="measurements">
+      <label class="field"
+        >الوزن (كجم)<input type="number" step="0.1" formControlName="weight" /></label
+      ><label class="field"
+        >الخصر (سم)<input type="number" step="0.1" formControlName="waist" /></label
+      ><label class="field"
+        >الصدر (سم)<input type="number" step="0.1" formControlName="chest" /></label
+      ><label class="field"
+        >الذراع (سم)<input type="number" step="0.1" formControlName="arms"
+      /></label>
+    </div>
+    <div>
+      <p class="field">صور التقدم <small>اختيارية · حتى 8 ميجابايت للصورة</small></p>
+      <div class="photo-slots">
+        @for (label of labels; track label; let index = $index) {
+          <label class="photo-slot">
+            @if (previews()[index]) {
+              <img [src]="previews()[index]" [alt]="label" />
+            } @else {
+              <span aria-hidden="true">▣</span>
+            }
+            <span>{{ label }}</span><input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              [disabled]="busy() || savedId() !== ''"
+              (change)="pick($event, index)"
+          /></label>
+        }
+      </div>
+    </div>
+    <fieldset>
+      <legend>مستوى طاقتك هذا الأسبوع</legend>
+      <div class="energy">
+        @for (value of [1, 2, 3, 4, 5]; track value) {
+          <label [class.selected]="form.controls.energy.value === value"
+            ><input type="radio" formControlName="energy" [value]="value" /><span>{{
+              value
+            }}</span></label
+          >
+        }
+      </div>
+    </fieldset>
+    <label class="field"
+      >كيف كان أسبوعك؟<textarea
+        formControlName="notes"
+        placeholder="التمرين، النوم، الجوع، أو أي شيء تود إخباري به…"
+      ></textarea>
+    </label>
+    @if (form.touched && form.invalid) {
+      <p class="error">راجع الوزن والقياسات المدخلة.</p>
+    }
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    @if (busy() && savedId()) {
+      <label class="field"
+        >رفع الصور {{ progress() }}%<progress [value]="progress()" max="100"></progress
+      ></label>
+    }
+    <div class="actions">
+      <button
+        class="btn secondary"
+        type="button"
+        [disabled]="busy()"
+        (click)="dialog.close(!!savedId())"
+      >
+        {{ savedId() ? 'إغلاق' : 'إلغاء' }}</button><button class="btn" [disabled]="busy()">
+        {{ busy() ? 'جارٍ الإرسال…' : savedId() ? 'إعادة رفع الصور' : 'إرسال إلى المدرب' }}
+      </button>
+    </div>
+  </form>
+</section>

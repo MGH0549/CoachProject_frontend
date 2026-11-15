@@ -1,0 +1,103 @@
+<header class="page-header">
+  <div>
+    <h1>العملاء</h1>
+    <p>فعّل الحسابات بعد الاتفاق على واتساب، وأدر خطط عملائك.</p>
+  </div>
+  <div class="actions">
+    <form (ngSubmit)="load()" class="search">
+      <label class="sr-only" for="client-search">البحث عن عميل</label
+      ><input
+        id="client-search"
+        name="search"
+        [(ngModel)]="search"
+        placeholder="ابحث عن عميل…"
+      /><button class="btn secondary" aria-label="بحث">بحث</button>
+    </form>
+    <button class="btn" (click)="registrationLink()">إضافة عميل</button>
+  </div>
+</header>
+<div class="three-columns counts">
+  <app-stat-card label="بانتظار التفعيل" [value]="counts().Pending" /><app-stat-card
+    label="عملاء نشطون"
+    [value]="counts().Active"
+  /><app-stat-card label="اشتراكات منتهية" [value]="counts().Expired" />
+</div>
+<div class="pills">
+  @for (filterItem of filters; track filterItem.label) {
+    <button
+      class="pill"
+      [class.active]="status === filterItem.value"
+      (click)="filter(filterItem.value)"
+    >
+      {{ filterItem.label }}
+    </button>
+  }
+</div>
+@if (loading()) {
+  <p class="empty" role="status">جارٍ تحميل العملاء…</p>
+} @else if (error()) {
+  <div class="empty">
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+  </div>
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>العميل</th>
+          <th>الباقة</th>
+          <th>الحالة</th>
+          <th>انتهاء الاشتراك</th>
+          <th>الإجراء</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (client of data()?.items; track client.id) {
+          <tr>
+            <td>
+              <a [routerLink]="['/coach/clients', client.id]"
+                ><strong>{{ client.fullName }}</strong
+                ><small class="email"
+                  ><bdi>{{ client.email }}</bdi></small
+                ></a
+              >
+            </td>
+            <td>{{ client.package || '—' }}</td>
+            <td><app-status-badge [status]="client.status" /></td>
+            <td>{{ client.accessEndAt | cairoDate }}</td>
+            <td>
+              @if (client.status !== 'Active') {
+                <button class="btn" (click)="access(client)">
+                  {{ client.status === 'Pending' ? 'تفعيل' : 'إعادة التفعيل' }}
+                </button>
+              } @else {
+                <a class="btn secondary" [routerLink]="['/coach/clients', client.id]">فتح الخطة</a>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="empty">لا توجد نتائج مطابقة.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="pager">
+    <button
+      class="btn secondary"
+      [disabled]="!data() || data()!.page <= 1"
+      (click)="load(data()!.page - 1)"
+    >
+      السابق</button
+    ><span>{{ data()?.page }} · {{ data()?.total }} عميل</span
+    ><button
+      class="btn secondary"
+      [disabled]="!data() || data()!.page * data()!.pageSize >= data()!.total"
+      (click)="load(data()!.page + 1)"
+    >
+      التالي
+    </button>
+  </div>
+}

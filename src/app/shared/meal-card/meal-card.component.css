@@ -1,0 +1,37 @@
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+header strong {
+  color: var(--green);
+  font-size: 13px;
+}
+header small {
+  font-size: 9px;
+}
+.pills {
+  gap: 6px;
+  margin-block: 10px;
+}
+.pill {
+  font-size: 10px;
+  padding: 5px 12px;
+}
+.macros {
+  color: var(--muted);
+  font-size: 10px;
+  margin-block-start: 15px;
+}
+.locked {
+  color: #ff8c98;
+  background: #2c1118;
+  border-radius: 12px;
+  font-size: 10px;
+  padding: 4px 10px;
+}
+.card {
+  height: 100%;
+  padding: 20px;
+}

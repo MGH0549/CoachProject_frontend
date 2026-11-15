@@ -1,0 +1,18 @@
+:root {
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --surface: #121214;
+  --raised: #1e1e20;
+  --border: #29292c;
+  --text: #f4f3f1;
+  --muted: #939397;
+  --red: #ec3347;
+  --red-text: #ff6374;
+  --action-red: #dc2c41;
+  --action-red-hover: #c82438;
+  --red-hover: #fa4658;
+  --green: #24ce7b;
+  --amber: #e9a35d;
+  --radius: 16px;
+  --font: 'Cairo', sans-serif;
+}

@@ -1,0 +1,24 @@
+<div class="chart" role="img" [attr.aria-label]="label() + ': ' + values().join('، ')">
+  @if (values().length) {
+    <svg viewBox="0 0 600 230" aria-hidden="true">
+      <defs>
+        <linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="#ec3347" stop-opacity=".18" />
+          <stop offset="100%" stop-color="#ec3347" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="M20 30H580 M20 85H580 M20 140H580 M20 195H580" stroke="#29292c" fill="none" />
+      <polygon [attr.points]="'20,215 ' + points() + ' 580,215'" fill="url(#chart-fill)" />
+      <polyline
+        [attr.points]="points()"
+        stroke="#ec3347"
+        stroke-width="3"
+        fill="none"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+      />
+    </svg>
+  } @else {
+    <p class="empty">سجّل متابعتك الأولى لعرض تقدمك.</p>
+  }
+</div>

@@ -1,0 +1,102 @@
+<div class="landing">
+  <header>
+    <app-brand />
+    <nav aria-label="القائمة الرئيسية">
+      <a href="#coaching">التدريب</a><a href="#how-it-works">كيف نبدأ</a
+      ><a href="#results">النتائج</a><a href="#contact">تواصل معنا</a>
+    </nav>
+    <div class="actions">
+      <a class="btn secondary" routerLink="/auth/sign-in">تسجيل الدخول</a
+      ><a class="btn" routerLink="/auth/register">انضم الآن</a>
+    </div>
+  </header>
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="tag"><i></i> تدريب أونلاين وشخصي</span>
+        <h1>تدرّب مع مدرب<br />يعرف اسمك<br />ويهتم بتقدمك.</h1>
+        <p>
+          لا برامج منسوخة. خطة مكتوبة لك، ونظام غذائي تستمتع به، وشخص حقيقي يتابعك كل أسبوع. أونلاين
+          أو وجهاً لوجه.
+        </p>
+        <div class="actions">
+          <a class="btn" routerLink="/auth/register">ابدأ رحلتك التدريبية</a
+          ><a class="btn secondary" href="#how-it-works">اكتشف كيف نبدأ</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong dir="ltr">120+</strong><small>عميل تم تدريبهم</small></div>
+          <div><strong>10 سنوات</strong><small>من الخبرة</small></div>
+          <div><strong>أونلاين + 1:1</strong><small>طرق التدريب</small></div>
+        </div>
+      </div>
+      <div class="coach-photo" role="img" aria-label="موضع صورة المدرب كما في التصميم">
+        <span>صورة المدرب</span>
+      </div>
+    </section>
+    <section id="how-it-works" class="steps-section">
+      <span class="eyebrow">كيف نبدأ</span>
+      <h2>أربع خطوات بسيطة للانطلاق</h2>
+      <p class="section-intro">
+        بدون دفع إلكتروني. سجّل حسابك، تواصل معي على واتساب، وأنا أفعّل حسابك.
+      </p>
+      <div class="steps">
+        @for (step of steps; track step.title; let index = $index) {
+          <article class="card">
+            <span class="step-number">{{ index + 1 }}</span>
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.text }}</p>
+          </article>
+        }
+      </div>
+    </section>
+    <section id="coaching">
+      <span class="eyebrow">التدريب</span>
+      <h2>اختر الطريقة المناسبة لك</h2>
+      <div class="three-columns packages">
+        @for (package of packages; track package.name) {
+          <article class="card package" [class.popular]="package.popular">
+            @if (package.popular) {
+              <span class="popular-label">الأكثر اختياراً</span>
+            }
+            <h3>{{ package.name }}</h3>
+            <p>{{ package.text }}</p>
+            <span class="price">السعر: اسأل على واتساب</span>
+            <ul class="check-list">
+              @for (item of package.items; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+            <a class="btn full" [class.secondary]="!package.popular" routerLink="/auth/register"
+              >تواصل مع المدرب</a
+            >
+          </article>
+        }
+      </div>
+    </section>
+    <section id="results">
+      <span class="eyebrow">النتائج</span>
+      <h2>عملاء حقيقيون. تحولات حقيقية.</h2>
+      <div class="three-columns results">
+        @for (result of results; track result.name) {
+          <article class="card">
+            <div class="result-photo">صورة قبل / بعد</div>
+            <h3>{{ result.name }}</h3>
+            <span class="result-caption">{{ result.result }}</span>
+            <p>«{{ result.quote }}»</p>
+          </article>
+        }
+      </div>
+    </section>
+    <section id="contact" class="cta">
+      <h2>مستعد للبدء؟</h2>
+      <p>أنشئ حسابك، تواصل معي على واتساب، ولنبدأ بناء خطتك.</p>
+      <a class="btn" routerLink="/auth/register">انضم الآن</a>
+    </section>
+  </main>
+  <footer>
+    <span
+      >© {{ 2026 }} Apex Coaching · <a routerLink="/privacy">الخصوصية</a> ·
+      <a routerLink="/terms">الشروط</a></span
+    ><span>التدريب أونلاين · التدريب الشخصي</span>
+  </footer>
+</div>

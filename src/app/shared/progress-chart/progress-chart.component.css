@@ -1,0 +1,9 @@
+.chart {
+  min-height: 180px;
+  direction: ltr;
+}
+.chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

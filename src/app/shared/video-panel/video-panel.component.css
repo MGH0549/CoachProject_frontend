@@ -1,0 +1,38 @@
+.video {
+  aspect-ratio: 16/10;
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.video button {
+  border: 0;
+  width: 100%;
+  height: 100%;
+  background: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+}
+.play {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  background: var(--red);
+  border-radius: 50%;
+  padding-inline-start: 3px;
+  font-size: 19px;
+  direction: ltr;
+}
+.video small {
+  font-size: 11px;
+}
+.video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}

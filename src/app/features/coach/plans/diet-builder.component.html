@@ -1,0 +1,227 @@
+<div class="diet">
+  <div class="builder-toolbar">
+    <label class="field"
+      >اسم النظام<input
+        [(ngModel)]="draft().name"
+        (ngModelChange)="change()"
+        placeholder="اسم النظام الغذائي"
+    /></label>
+    <div class="actions">
+      <button class="btn secondary" [disabled]="busy() || loading()" (click)="reload()">
+        إعادة تحميل
+      </button>
+      <button class="btn secondary" [disabled]="busy()" (click)="save(true)">حفظ كقالب</button
+      ><button class="btn green" [disabled]="busy() || loading()" (click)="save()">
+        {{ busy() ? 'جارٍ الحفظ…' : 'حفظ النظام' }}
+      </button>
+    </div>
+  </div>
+  @if (error()) {
+    <div class="empty">
+      <p>{{ error() }}</p>
+      <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+    </div>
+  } @else if (loading()) {
+    <p class="empty">جارٍ تحميل النظام الغذائي…</p>
+  } @else {
+    <div class="builder">
+      <aside class="card meals">
+        <span class="eyebrow">الوجبات</span>
+        @for (item of draft().meals; track $index; let index = $index) {
+          <button
+            class="meal-button"
+            [class.active]="mealIndex() === index"
+            (click)="mealIndex.set(index)"
+          >
+            <strong>{{ item.name }}</strong><small
+              >{{ item.time || '—' }} · {{ item.options.length }} خيارات</small
+            >
+          </button>
+        }
+        <button class="btn secondary full" (click)="addMeal()">+ إضافة وجبة</button>
+      </aside>
+      <div class="stack">
+        @if (meal) {
+          <div class="meal-heading">
+            <label class="field"
+              >اسم الوجبة<input [(ngModel)]="meal.name" (ngModelChange)="change()" /></label
+            ><label class="field"
+              >الوقت<input type="time" [(ngModel)]="meal.time" (ngModelChange)="change()" /></label
+            ><button class="text-button" (click)="removeMeal()">حذف الوجبة</button>
+          </div>
+          @for (option of meal.options; track option; let index = $index) {
+            <section class="card option">
+              <div class="option-heading">
+                <span class="eyebrow">الخيار {{ index + 1 }}</span
+                ><button
+                  class="text-button"
+                  (click)="meal.options.splice(index, 1); change()"
+                  [disabled]="meal.options.length <= 2"
+                  aria-label="حذف الخيار"
+                >
+                  ×
+                </button>
+              </div>
+              <label class="field"
+                >اسم الخيار<input
+                  [(ngModel)]="option.name"
+                  (ngModelChange)="change()"
+                  placeholder="اسم خيار الوجبة"
+              /></label>
+              <div class="four-columns macros">
+                <label class="field"
+                  >سعرات<input
+                    type="number"
+                    min="0"
+                    [(ngModel)]="option.calories"
+                    (ngModelChange)="change()" /></label
+                ><label class="field"
+                  >بروتين (جم)<input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    [(ngModel)]="option.protein"
+                    (ngModelChange)="change()" /></label
+                ><label class="field"
+                  >كربوهيدرات (جم)<input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    [(ngModel)]="option.carbs"
+                    (ngModelChange)="change()" /></label
+                ><label class="field"
+                  >دهون (جم)<input
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    [(ngModel)]="option.fat"
+                    (ngModelChange)="change()"
+                /></label>
+              </div>
+              <h3>مكونات الوجبة</h3>
+              @for (item of option.items; track item; let foodIndex = $index) {
+                <div class="food">
+                  <label class="field"
+                    >الطعام<input [(ngModel)]="item.food" (ngModelChange)="change()" /></label
+                  ><label class="field"
+                    >الكمية<input
+                      type="number"
+                      min="0.1"
+                      step="0.1"
+                      [(ngModel)]="item.quantity"
+                      (ngModelChange)="change()" /></label
+                  ><label class="field"
+                    >الوحدة<input [(ngModel)]="item.unit" (ngModelChange)="change()" /></label
+                  ><button
+                    class="text-button"
+                    (click)="option.items.splice(foodIndex, 1); change()"
+                    aria-label="حذف المكون"
+                  >
+                    ×
+                  </button>
+                </div>
+              }
+              <button class="text-button add" (click)="addFood(option)">+ إضافة مكون</button>
+            </section>
+          }
+          <button class="btn secondary full add" (click)="addOption()">+ إضافة خيار آخر</button>
+        } @else {
+          <p class="empty">أضف وجبة لتبدأ بناء النظام الغذائي.</p>
+        }
+      </div>
+      <aside class="stack">
+        <section class="card targets">
+          <h3>الأهداف اليومية</h3>
+          <p class="caption">الأرقام المستهدفة للعميل</p>
+          <label class="field"
+            >السعرات<input
+              type="number"
+              min="0"
+              [(ngModel)]="draft().calories"
+              (ngModelChange)="change()" /></label
+          ><label class="field"
+            >البروتين (جم)<input
+              type="number"
+              min="0"
+              step="0.1"
+              [(ngModel)]="draft().protein"
+              (ngModelChange)="change()" /></label
+          ><label class="field"
+            >الكربوهيدرات (جم)<input
+              type="number"
+              min="0"
+              step="0.1"
+              [(ngModel)]="draft().carbs"
+              (ngModelChange)="change()" /></label
+          ><label class="field"
+            >الدهون (جم)<input
+              type="number"
+              min="0"
+              step="0.1"
+              [(ngModel)]="draft().fat"
+              (ngModelChange)="change()"
+          /></label>
+          @if (original()?.selectedTotals; as totals) {
+            <hr class="divider" />
+            <h3>اختيارات العميل اليوم</h3>
+            <p class="caption success">{{ totals.calories }} / {{ draft().calories }} سعر</p>
+            <p class="caption">
+              بروتين {{ totals.protein }} · كربوهيدرات {{ totals.carbs }} · دهون {{ totals.fat }}
+            </p>
+          }
+        </section>
+        @if (!templateMode() && original(); as plan) {
+          <section class="card choices">
+            <h3>اختيارات العميل والأقفال</h3>
+            <label class="lock"
+              ><span>قفل النظام بالكامل</span
+              ><input
+                type="checkbox"
+                [checked]="original()?.choicesLocked"
+                [disabled]="busy() || dirty()"
+                (change)="lockAll($any($event.target).checked)"
+            /></label>
+            @for (originalMeal of original()?.meals; track originalMeal.id) {
+              <div class="choice">
+                <strong>{{ originalMeal.name }}</strong><label class="field"
+                  >الخيار الحالي<select
+                    [value]="originalMeal.selection?.optionId || ''"
+                    [disabled]="busy() || dirty()"
+                    (change)="
+                      select(
+                        originalMeal.id,
+                        $any($event.target).value,
+                        !!originalMeal.selection?.locked
+                      )
+                    "
+                  >
+                    <option value="">لم يختر بعد</option>
+                    @for (option of originalMeal.options; track option.id) {
+                      <option [value]="option.id">{{ option.name }}</option>
+                    }
+                  </select></label
+                ><label class="lock"
+                  ><span>قفل الوجبة</span
+                  ><input
+                    type="checkbox"
+                    [checked]="originalMeal.selection?.locked"
+                    [disabled]="busy() || dirty() || !originalMeal.selection"
+                    (change)="
+                      select(
+                        originalMeal.id,
+                        originalMeal.selection!.optionId,
+                        $any($event.target).checked
+                      )
+                    "
+                /></label>
+              </div>
+            }
+            @if (dirty()) {
+              <p class="caption muted">احفظ تغييرات النظام قبل تعديل الاختيارات والأقفال.</p>
+            }
+          </section>
+        }
+      </aside>
+    </div>
+  }
+</div>

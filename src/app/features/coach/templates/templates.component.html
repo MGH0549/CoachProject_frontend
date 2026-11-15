@@ -1,0 +1,109 @@
+<header class="page-header">
+  <div>
+    <h1>قوالب الخطط</h1>
+    <p>ابنِ الخطة مرة واحدة وانسخها لأي عميل. كل نسخة مستقلة.</p>
+  </div>
+  <a class="btn" [routerLink]="['/coach/templates', diet() ? 'diet' : 'training', 'new']"
+    >قالب جديد</a
+  >
+</header>
+<div class="pills">
+  <button class="pill" [class.active]="!diet()" (click)="switchTab(false)">قوالب التدريب</button
+  ><button class="pill" [class.active]="diet()" (click)="switchTab(true)">
+    قوالب الأنظمة الغذائية
+  </button>
+</div>
+<form class="actions search" (ngSubmit)="load()">
+  <label class="sr-only" for="template-search">بحث القوالب</label
+  ><input
+    id="template-search"
+    name="search"
+    [(ngModel)]="search"
+    placeholder="ابحث عن قالب…"
+  /><button class="btn secondary">بحث</button>
+</form>
+@if (error()) {
+  <p class="error">{{ error() }}</p>
+}
+<div class="template-layout">
+  <div>
+    @if (loading()) {
+      <p class="empty" role="status">جارٍ تحميل القوالب…</p>
+    } @else {
+      <div class="template-grid">
+        @for (template of data()?.items; track template.id) {
+          <article class="card template" [class.selected]="selected()?.id === template.id">
+            <button class="template-select" (click)="selected.set(template)">
+              <h3>{{ template.name }}</h3>
+              <small>إصدار {{ template.version }}</small>
+            </button>
+            <div class="actions">
+              <a [routerLink]="['/coach/templates', diet() ? 'diet' : 'training', template.id]"
+                >تعديل</a
+              ><button class="text-button" [disabled]="busy()" (click)="duplicate(template.id)">
+                إنشاء نسخة
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <p class="empty">لا توجد قوالب بعد. أنشئ قالبك الأول.</p>
+        }
+      </div>
+    }
+    <div class="pager">
+      <button
+        class="btn secondary"
+        [disabled]="!data() || data()!.page <= 1"
+        (click)="load(data()!.page - 1)"
+      >
+        السابق</button
+      ><span>{{ data()?.page }}</span
+      ><button
+        class="btn secondary"
+        [disabled]="!data() || data()!.page * data()!.pageSize >= data()!.total"
+        (click)="load(data()!.page + 1)"
+      >
+        التالي
+      </button>
+    </div>
+  </div>
+  <aside class="card use-template">
+    <h3>استخدام هذا القالب</h3>
+    <div class="selected-template">{{ selected()?.name || 'اختر قالباً من القائمة' }}</div>
+    <form class="actions" (ngSubmit)="loadClients()">
+      <label class="sr-only" for="copy-search">ابحث عن العميل</label
+      ><input
+        id="copy-search"
+        name="clientSearch"
+        [(ngModel)]="clientSearch"
+        placeholder="ابحث عن عميل…"
+      /><button class="btn secondary">بحث</button>
+    </form>
+    <div class="client-list">
+      @for (client of clients()?.items; track client.id) {
+        <button [class.selected]="clientId() === client.id" (click)="clientId.set(client.id)">
+          {{ client.fullName }} <span>{{ clientId() === client.id ? '✓' : '' }}</span>
+        </button>
+      }
+    </div>
+    <div class="pager">
+      <button
+        class="text-button"
+        [disabled]="!clients() || clients()!.page <= 1"
+        (click)="loadClients(clients()!.page - 1)"
+      >
+        السابق</button
+      ><button
+        class="text-button"
+        [disabled]="!clients() || clients()!.page * clients()!.pageSize >= clients()!.total"
+        (click)="loadClients(clients()!.page + 1)"
+      >
+        التالي
+      </button>
+    </div>
+    <p class="caption">تُنشأ نسخة مستقلة يمكن تعديلها للعميل دون تغيير القالب.</p>
+    <button class="btn full" [disabled]="busy() || !selected() || !clientId()" (click)="copy()">
+      {{ busy() ? 'جارٍ النسخ…' : 'نسخ إلى العميل' }}
+    </button>
+  </aside>
+</div>

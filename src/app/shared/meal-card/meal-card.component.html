@@ -1,0 +1,35 @@
+<article class="card diet">
+  <header>
+    <h3>{{ meal().name }}</h3>
+    <strong>{{ selected()?.calories ?? '—' }} <small>سعر حراري</small></strong>
+  </header>
+  <p class="caption">الوقت: {{ meal().time || 'حسب خطتك' }}</p>
+  <div class="pills">
+    @for (option of meal().options; track option.id) {
+      <button
+        class="pill"
+        [class.active]="selected()?.id === option.id"
+        [attr.aria-pressed]="selected()?.id === option.id"
+        [disabled]="locked() || busy()"
+        (click)="choose.emit(option.id)"
+      >
+        {{ option.name }}
+      </button>
+    }
+  </div>
+  @if (locked()) {
+    <span class="locked">🔒 مقفل بواسطة المدرب</span>
+  }
+  @if (selected(); as option) {
+    <ul class="check-list">
+      @for (item of option.items; track $index) {
+        <li>{{ item.quantity }} {{ item.unit }} {{ item.food }}</li>
+      }
+    </ul>
+    <div class="macros">
+      بروتين {{ option.protein }} جم · كربوهيدرات {{ option.carbs }} جم · دهون {{ option.fat }} جم
+    </div>
+  } @else {
+    <p class="caption">اختر أحد الخيارات لعرض مكوناته.</p>
+  }
+</article>

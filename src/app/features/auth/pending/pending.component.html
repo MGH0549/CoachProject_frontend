@@ -1,0 +1,36 @@
+<main class="pending-page">
+  <section class="card pending">
+    <app-status-badge [status]="session.account()?.status || 'Pending'" />
+    <h1>
+      {{
+        session.account()?.status === 'Expired'
+          ? 'انتهت مدة اشتراكك'
+          : session.account()?.status === 'Deactivated'
+            ? 'حسابك غير مفعل'
+            : 'أهلاً بك في الفريق، ' + (session.account()?.fullName || '') + '!'
+      }}
+    </h1>
+    <p>
+      تواصل مع مدربك على واتساب للاتفاق على الباقة. بعد التفعيل، ستجد خطتك التدريبية ونظامك الغذائي
+      هنا.
+    </p>
+    <ol>
+      <li class="done">تم إنشاء حسابك</li>
+      <li>تواصل مع المدرب على واتساب</li>
+      <li>يفعّل المدرب حسابك</li>
+      <li>استلم خطتك وابدأ التدريب</li>
+    </ol>
+    @if (whatsapp) {
+      <a class="btn full" [href]="whatsapp" target="_blank" rel="noopener noreferrer"
+        >تواصل مع المدرب على واتساب</a
+      >
+    }
+    <button class="btn secondary full" (click)="check()" [disabled]="busy()">
+      {{ busy() ? 'جارٍ التحقق…' : 'التحقق من حالة الحساب' }}</button><button
+      class="text-button"
+      (click)="logout()"
+    >
+      تسجيل الخروج
+    </button>
+  </section>
+</main>

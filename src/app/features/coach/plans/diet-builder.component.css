@@ -1,0 +1,159 @@
+.builder-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-block-end: 24px;
+}
+.builder-toolbar > .field {
+  width: min(400px, 100%);
+}
+.builder {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr) 260px;
+  gap: 20px;
+  align-items: start;
+}
+.eyebrow,
+.add {
+  color: var(--green);
+}
+.meals {
+  padding: 14px;
+}
+.meal-button {
+  display: block;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: start;
+  color: var(--text);
+  padding: 12px;
+  width: 100%;
+  margin-block: 10px;
+}
+.meal-button.active {
+  background: #12261a;
+  border-color: var(--green);
+}
+.meal-button small {
+  display: block;
+  font-size: 10px;
+}
+.meal-button strong {
+  font-size: 12px;
+}
+.meals .btn {
+  font-size: 10px;
+  padding: 8px;
+}
+.meal-heading {
+  display: grid;
+  grid-template-columns: 1fr 130px auto;
+  gap: 10px;
+  align-items: end;
+}
+.option {
+  border-color: #175130;
+  display: grid;
+  gap: 15px;
+}
+.option-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.option h3 {
+  font-size: 12px;
+}
+.macros {
+  gap: 8px;
+}
+.macros input {
+  padding: 8px;
+}
+.food {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 80px 65px 30px;
+  gap: 8px;
+  align-items: end;
+}
+.food input {
+  padding: 9px;
+}
+.food .text-button {
+  padding: 0;
+}
+.targets,
+.choices {
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+.targets h3,
+.choices h3 {
+  font-size: 14px;
+}
+.lock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.lock input {
+  accent-color: var(--green);
+}
+.choice {
+  display: grid;
+  gap: 9px;
+  padding-block: 12px;
+  border-block-start: 1px solid var(--border);
+}
+.choice strong {
+  font-size: 12px;
+}
+@media (max-width: 1250px) {
+  .builder {
+    grid-template-columns: 160px minmax(0, 1fr);
+  }
+  .builder > aside:last-child {
+    grid-column: 2;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .builder-toolbar {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 800px) {
+  .builder {
+    grid-template-columns: 1fr;
+  }
+  .builder > aside:last-child {
+    grid-column: auto;
+    grid-template-columns: 1fr;
+  }
+  .meals {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .meal-button {
+    width: auto;
+    min-width: 90px;
+  }
+  .builder-toolbar .actions {
+    width: 100%;
+  }
+  .meal-heading {
+    grid-template-columns: 1fr 110px;
+  }
+  .meal-heading .text-button {
+    grid-column: 1/-1;
+  }
+  .food {
+    grid-template-columns: 1fr 65px 55px 25px;
+  }
+}

@@ -1,0 +1,40 @@
+<a class="skip-link" href="#main-content">انتقل إلى المحتوى</a>
+<div class="app-layout">
+  <aside class="sidebar">
+    <app-brand [compact]="true" />
+    @if (session.tokens.role() === 'Coach') {
+      <span class="eyebrow">المدرب</span>
+    }
+    <nav aria-label="القائمة الرئيسية">
+      @for (link of links; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active"
+          ><app-icon class="nav-icon" [name]="link.label" />{{ link.label | transloco }}</a
+        >
+      }
+    </nav>
+    <div class="identity">
+      <span class="avatar">{{
+        session.tokens.role() === 'Coach' ? 'CO' : session.account()?.fullName?.slice(0, 1)
+      }}</span>
+      <div>
+        <strong>{{ session.account()?.fullName || 'المدرب' }}</strong><small>{{
+          session.tokens.role() === 'Coach'
+            ? 'إدارة المنصة'
+            : 'حتى ' + (session.account()?.accessEndAt | cairoDate)
+        }}</small>
+      </div>
+    </div>
+    <button class="logout" (click)="signOut()">{{ 'signOut' | transloco }}</button>
+  </aside>
+  <main id="main-content" tabindex="-1"><router-outlet /></main>
+</div>
+<nav class="mobile-nav" aria-label="التنقل على الهاتف">
+  @for (link of links; track link.path) {
+    <a [routerLink]="link.path" routerLinkActive="active"
+      ><app-icon [name]="link.label" />{{ link.label | transloco }}</a
+    >
+  }
+  <button (click)="signOut()" aria-label="تسجيل الخروج">
+    <span aria-hidden="true">⇥</span>خروج
+  </button>
+</nav>

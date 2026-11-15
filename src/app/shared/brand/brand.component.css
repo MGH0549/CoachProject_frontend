@@ -1,0 +1,16 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  min-height: 44px;
+}
+.mark {
+  display: block;
+  width: 25px;
+  height: 25px;
+  background: var(--red);
+  border-radius: 7px;
+}

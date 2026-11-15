@@ -1,0 +1,46 @@
+import { TestBed } from '@angular/core/testing';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { API_BASE_URL } from '../config/api-base-url.token';
+import { TokenStore } from './token-store.service';
+import { authInterceptor } from './auth.interceptor';
+describe('Access token interceptor', () => {
+  beforeEach(() =>
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withInterceptors([authInterceptor])),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        { provide: API_BASE_URL, useValue: 'http://localhost:3000/api' },
+      ],
+    }),
+  );
+  afterEach(() => TestBed.inject(HttpTestingController).verify());
+  it('retries two expired API calls after exactly one refresh', async () => {
+    const http = TestBed.inject(HttpClient),
+      testing = TestBed.inject(HttpTestingController);
+    TestBed.inject(TokenStore).token.set('expired');
+    const values: unknown[] = [];
+    http.get('http://localhost:3000/api/v1/me/training').subscribe((v) => values.push(v));
+    http.get('http://localhost:3000/api/v1/me/diet').subscribe((v) => values.push(v));
+    const initial = testing.match((r) => r.headers.get('Authorization') === 'Bearer expired');
+    expect(initial).toHaveLength(2);
+    initial.forEach((r) => r.flush({}, { status: 401, statusText: 'Unauthorized' }));
+    testing
+      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .flush({ accessToken: 'fresh', expiresIn: 900 });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    const retried = testing.match((r) => r.headers.get('Authorization') === 'Bearer fresh');
+    expect(retried).toHaveLength(2);
+    retried.forEach((r) => r.flush({ ok: true }));
+    expect(values).toHaveLength(2);
+  });
+  it('never adds tokens to an unrelated origin', () => {
+    TestBed.inject(TokenStore).token.set('private-token');
+    TestBed.inject(HttpClient).get('https://example.com').subscribe();
+    const request = TestBed.inject(HttpTestingController).expectOne('https://example.com');
+    expect(request.request.headers.has('Authorization')).toBe(false);
+    request.flush({});
+  });
+});

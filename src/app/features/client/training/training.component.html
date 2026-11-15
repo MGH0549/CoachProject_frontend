@@ -1,0 +1,111 @@
+<header class="page-header">
+  <div>
+    <span class="eyebrow">مرحباً، {{ session.account()?.fullName }}</span>
+    <h1>{{ day()?.name || 'الخطة التدريبية' }}</h1>
+  </div>
+  <small>خطتك الشخصية من مدربك</small>
+</header>
+@if (loading()) {
+  <p class="empty" role="status">جارٍ تحميل خطتك…</p>
+} @else if (error()) {
+  <div class="empty">
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+  </div>
+} @else if (plan(); as plan) {
+  <div class="pills" role="tablist" aria-label="أيام التدريب">
+    @for (day of plan.days; track day.id; let index = $index) {
+      <button
+        class="pill"
+        role="tab"
+        [attr.aria-selected]="dayIndex() === index"
+        [class.active]="dayIndex() === index"
+        (click)="selectDay(index)"
+      >
+        {{ day.name }}
+      </button>
+    }
+  </div>
+  <div class="training-grid">
+    <div class="exercise-list">
+      @for (placement of day()?.exercises; track placement.id) {
+        <div>
+          <button
+            class="exercise-row"
+            [class.selected]="selected()?.id === placement.id"
+            (click)="selectedId.set(placement.id)"
+          >
+            <span class="video-thumb" aria-hidden="true"><span>▶</span></span
+            ><span class="exercise-label"
+              ><strong
+                ><bdi>{{ placement.exercise.name }}</bdi></strong
+              ><small>{{ placement.exercise.muscleGroup }}</small></span
+            ><span class="reps"
+              ><bdi>{{ placement.sets }} × {{ placement.reps }}</bdi
+              ><small>راحة {{ placement.restSeconds }} ث</small></span
+            ><span aria-hidden="true">{{ completed().includes(placement.id) ? '✓' : '‹' }}</span>
+          </button>
+          @if (selected()?.id === placement.id && placement.alternatives.length) {
+            <div class="alternatives">
+              <span class="caption muted">{{
+                plan.choicesLocked || placement.choicesLocked ? '🔒 خيارات مقفلة' : 'بدائل التمرين'
+              }}</span>
+              <div class="pills">
+                <button
+                  class="pill"
+                  [class.active]="!placement.selectedAlternativeId"
+                  [disabled]="busy() || plan.choicesLocked || placement.choicesLocked"
+                  (click)="choose(placement, null)"
+                >
+                  التمرين الأساسي
+                </button>
+                @for (alt of placement.alternatives; track alt.id) {
+                  <button
+                    class="pill"
+                    [class.active]="placement.selectedAlternativeId === alt.id"
+                    [disabled]="busy() || plan.choicesLocked || placement.choicesLocked"
+                    (click)="choose(placement, alt.id)"
+                  >
+                    <bdi>{{ alt.exercise.name }}</bdi>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @empty {
+        <p class="empty">لم يضف المدرب تمارين لهذا اليوم بعد.</p>
+      }
+    </div>
+    @if (exercise(); as exercise) {
+      <aside class="card video-card">
+        <app-video-panel [videoId]="exercise.youtubeVideoId" [title]="exercise.name" />
+        <h2>
+          <bdi>{{ exercise.name }}</bdi>
+        </h2>
+        <span class="muscle">{{ exercise.muscleGroup }}</span>
+        @if (selected()?.note || exercise.notes) {
+          <div class="coach-note">
+            <span class="eyebrow">ملاحظة المدرب</span>
+            <p>{{ alternative()?.note || selected()?.note || exercise.notes }}</p>
+          </div>
+        }
+        <button
+          class="btn full"
+          [disabled]="busy() || completed().includes(selected()!.id)"
+          (click)="log()"
+        >
+          {{
+            completed().includes(selected()!.id)
+              ? '✓ تم تسجيل التمرين'
+              : busy()
+                ? 'جارٍ الحفظ…'
+                : 'تسجيل إتمام التمرين'
+          }}
+        </button>
+      </aside>
+    }
+  </div>
+} @else {
+  <p class="empty">سيضيف المدرب خطتك قريباً.</p>
+}

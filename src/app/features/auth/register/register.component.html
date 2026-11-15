@@ -1,0 +1,51 @@
+<h1>أنشئ حسابك</h1>
+<p class="intro">دقيقة واحدة وتبدأ رحلتك. يفعّل المدرب حسابك بعد الاتفاق على الاشتراك.</p>
+<form class="form-stack" [formGroup]="form" (ngSubmit)="submit()">
+  <label class="field"
+    >الاسم الكامل<input
+      formControlName="fullName"
+      autocomplete="name"
+      placeholder="اسمك الكامل" /></label
+  ><label class="field"
+    >البريد الإلكتروني<input
+      type="email"
+      dir="ltr"
+      formControlName="email"
+      autocomplete="email"
+      placeholder="you@email.com" /></label
+  ><label class="field"
+    >رقم واتساب<input
+      type="tel"
+      dir="ltr"
+      formControlName="whatsapp"
+      autocomplete="tel"
+      placeholder="+201234567890" /></label
+  ><label class="field"
+    >كلمة المرور<input
+      type="password"
+      formControlName="password"
+      autocomplete="new-password"
+      placeholder="12 حرفاً على الأقل، تشمل حروفاً وأرقاماً" /></label
+  ><label class="consent"
+    ><input type="checkbox" formControlName="consent" />أوافق على معالجة بياناتي الشخصية والصحية
+    لتقديم خدمة التدريب.</label
+  >
+  @if (form.touched && form.invalid) {
+    <p class="error">
+      أكمل الحقول. استخدم رقماً دولياً وكلمة مرور من 12–128 حرفاً تشمل حروفاً وأرقاماً، ووافق على استخدام
+      البيانات.
+    </p>
+  }
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  <button class="btn full" [disabled]="busy() || registered()">
+    {{ busy() ? 'جارٍ إنشاء الحساب…' : 'إنشاء حساب' }}
+  </button>
+</form>
+<p class="caption muted">
+  راجع <a class="link" routerLink="/privacy">سياسة الخصوصية</a> و<a class="link" routerLink="/terms"
+    >شروط الاستخدام</a
+  >.
+</p>
+<p class="footer">لديك حساب بالفعل؟ <a class="link" routerLink="/auth/sign-in">تسجيل الدخول</a></p>

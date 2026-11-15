@@ -1,0 +1,135 @@
+.app-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  min-height: 100dvh;
+}
+.sidebar {
+  background: var(--surface);
+  border-inline-end: 1px solid var(--border);
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+}
+.sidebar nav {
+  display: grid;
+  gap: 6px;
+  margin-block-start: 34px;
+}
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 44px;
+}
+.sidebar nav a.active {
+  background: var(--raised);
+  color: var(--text);
+}
+.active .nav-icon {
+  color: var(--red);
+}
+.nav-icon {
+  font-size: 20px;
+  width: 20px;
+  text-align: center;
+}
+.identity {
+  margin-block-start: auto;
+  background: var(--raised);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+.identity strong {
+  font-size: 12px;
+}
+.identity small {
+  display: block;
+  font-size: 10px;
+}
+.avatar {
+  border-radius: 50%;
+  background: var(--red);
+  width: 33px;
+  height: 33px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.logout {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 11px;
+  min-height: 44px;
+}
+main {
+  padding: 40px 36px;
+  min-width: 0;
+  max-width: 1600px;
+  width: 100%;
+  margin-inline: auto;
+}
+.mobile-nav {
+  display: none;
+}
+.skip-link {
+  position: fixed;
+  inset-block-start: -80px;
+  z-index: 100;
+  background: var(--red);
+  padding: 10px;
+}
+.skip-link:focus {
+  inset-block-start: 0;
+}
+@media (max-width: 760px) {
+  .app-layout {
+    display: block;
+  }
+  .sidebar {
+    display: none;
+  }
+  main {
+    padding: 24px 16px 100px;
+  }
+  .mobile-nav {
+    position: fixed;
+    inset-block-end: 0;
+    inset-inline: 0;
+    background: var(--surface);
+    border-block-start: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 6px max(6px, env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .mobile-nav a,
+  .mobile-nav button {
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    padding: 6px;
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font-size: 10px;
+    min-width: 60px;
+    min-height: 48px;
+  }
+  .mobile-nav span {
+    font-size: 22px;
+  }
+  .mobile-nav .active {
+    color: var(--red);
+  }
+}

@@ -1,0 +1,46 @@
+<a routerLink="/coach/clients" class="back">› العملاء</a>
+@if (client(); as client) {
+  <header class="page-header">
+    <div>
+      <div class="actions">
+        <h1>{{ client.fullName }}</h1>
+        <app-status-badge [status]="client.status" />
+      </div>
+      <p>
+        {{ client.package || 'بدون باقة' }} · حتى {{ client.accessEndAt | cairoDate }} ·
+        <bdi>{{ client.whatsapp }}</bdi>
+      </p>
+    </div>
+    <div class="actions">
+      <button class="btn secondary" (click)="access()">
+        {{ client.status === 'Active' ? 'تمديد الاشتراك' : 'تفعيل الحساب' }}
+      </button>
+      @if (client.status === 'Active') {
+        <button class="text-button" [disabled]="busy()" (click)="deactivate()">إيقاف الحساب</button>
+      }
+    </div>
+  </header>
+  <div class="pills">
+    <button class="pill" [class.active]="tab() === 'training'" (click)="switchTab('training')">
+      الخطة التدريبية</button
+    ><button class="pill" [class.active]="tab() === 'diet'" (click)="switchTab('diet')">
+      النظام الغذائي</button
+    ><button class="pill" [class.active]="tab() === 'progress'" (click)="switchTab('progress')">
+      التقدم والملاحظات
+    </button>
+  </div>
+  @if (tab() === 'training') {
+    <app-training-builder [clientId]="id" />
+  } @else if (tab() === 'diet') {
+    <app-diet-builder [clientId]="id" />
+  } @else {
+    <app-client-progress [clientId]="id" />
+  }
+} @else if (error()) {
+  <div class="empty">
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="load()">إعادة المحاولة</button>
+  </div>
+} @else {
+  <p class="empty">جارٍ تحميل العميل…</p>
+}
