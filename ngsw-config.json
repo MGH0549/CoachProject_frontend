@@ -1,0 +1,35 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.csr.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/index.csr.html",
+          "/*.css",
+          "/*.js",
+          "!/ngsw-worker.js",
+          "!/safety-worker.js",
+          "!/worker-basic.min.js",
+          "/media/*.woff2",
+          "/favicon.svg",
+          "/manifest.webmanifest",
+          "/icons/*.png"
+        ]
+      }
+    },
+    {
+      "name": "public-photos",
+      "installMode": "lazy",
+      "updateMode": "lazy",
+      "resources": {
+        "files": ["/images/landing/*.jpg", "/images/landing/*.png", "/images/landing/*.webp"]
+      }
+    }
+  ],
+  "dataGroups": [],
+  "navigationUrls": ["/**", "!/**/*.*", "!/**/*__*", "!/**/*__*/**", "!/api", "!/api/**"],
+  "navigationRequestStrategy": "freshness"
+}

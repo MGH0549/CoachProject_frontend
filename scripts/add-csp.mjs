@@ -20,6 +20,8 @@ async function processDirectory(directory) {
       `script-src 'self' ${hashes.join(' ')}`,
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self'",
+      "worker-src 'self'",
+      "manifest-src 'self'",
       `connect-src 'self' ${new URL(environment.apiBaseUrl).origin}`,
       "img-src 'self' blob: data: https://res.cloudinary.com",
       'frame-src https://www.youtube-nocookie.com',

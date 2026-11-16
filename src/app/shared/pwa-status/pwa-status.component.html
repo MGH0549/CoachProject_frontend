@@ -1,0 +1,37 @@
+@if (offline()) {
+  <div class="pwa-bar offline" role="status">
+    أنت غير متصل بالإنترنت. عرض الخطط وحفظ التغييرات يحتاجان إلى اتصال.
+  </div>
+}
+@if (updateReady()) {
+  <div class="pwa-bar" role="status">
+    <span>يتوفر تحديث للتطبيق. احفظ أي تغييرات قبل إعادة التحميل.</span>
+    <button type="button" class="btn" [disabled]="offline()" (click)="reload()">
+      إعادة التحميل
+    </button>
+  </div>
+} @else if (!installDismissed() && (canInstall() || iosInstall())) {
+  <aside class="pwa-bar" aria-label="تثبيت تطبيق أبيكس">
+    <div>
+      <strong dir="ltr">APEX Coaching</strong>
+      @if (showIosHelp()) {
+        <p>افتح الموقع في Safari، ثم اختر مشاركة ← إضافة إلى الشاشة الرئيسية.</p>
+      } @else {
+        <p>أضف التطبيق إلى شاشتك الرئيسية للوصول بسرعة إلى خطتك.</p>
+      }
+    </div>
+    @if (!showIosHelp()) {
+      <button type="button" class="btn" [disabled]="installing()" (click)="install()">
+        تثبيت التطبيق
+      </button>
+    }
+    <button
+      type="button"
+      class="text-button"
+      aria-label="إخفاء اقتراح التثبيت"
+      (click)="installDismissed.set(true)"
+    >
+      لاحقاً
+    </button>
+  </aside>
+}

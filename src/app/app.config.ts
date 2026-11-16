@@ -20,6 +20,7 @@ import {
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import { provideServiceWorker } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { API_BASE_URL } from './core/config/api-base-url.token';
 import { provideApiConfiguration } from './core/api/api-configuration';
@@ -47,5 +48,10 @@ export const appConfig: ApplicationConfig = {
     { provide: API_BASE_URL, useValue: environment.apiBaseUrl },
     provideApiConfiguration(new URL(environment.apiBaseUrl).origin),
     provideRouter(routes),
+    provideServiceWorker('ngsw-worker.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000',
+      updateViaCache: 'none',
+    }),
   ],
 };

@@ -37,7 +37,7 @@ Each component, service, guard, model, pipe, and endpoint operation lives in its
 
 Colors and surfaces are centralized in `src/styles/tokens.css`. Cairo font files are served locally. All dates display in Africa/Cairo with Western digits. Public and protected screens are lazy loaded.
 
-Access tokens stay in memory. Cookies are included only for the configured API. Concurrent refresh calls share a single request. Route guards reflect the backend's role and account-status rules; authorization remains enforced by the server. No service worker or browser-storage caching of health data is used. YouTube embeds load only when requested and use youtube-nocookie.com.
+Access tokens stay in memory. Cookies are included only for the configured API. Concurrent refresh calls share a single request. Route guards reflect the backend's role and account-status rules; authorization remains enforced by the server. The production service worker caches only static app files and public landing photos, with no API or health-data caching. YouTube embeds load only when requested and use youtube-nocookie.com.
 
 ## API contract
 
@@ -74,6 +74,20 @@ The CI workflow runs these checks and a dependency audit. At implementation time
 `npm run build` creates `dist/coaching-platform/browser`. The landing, privacy, and terms pages are prerendered; authenticated screens render in the browser. HTTP transfer caching is disabled so private API data is never embedded in HTML. The final build step adds hashes for inline scripts to each static page's Content Security Policy.
 
 `public/_redirects` and `public/_headers` provide SPA fallback, framing/content-type protections, and no-store headers for protected routes on hosts that support those files. Other hosts need equivalent configuration. No deployment was performed.
+
+## Mobile PWA
+
+Production builds support home-screen installation with Android icons, a maskable icon, an Apple touch icon, and an Arabic standalone manifest. Android browsers show a “تثبيت التطبيق” button when the browser makes installation available. On iPhone/iPad, the button opens Safari “Share → Add to Home Screen” instructions. Installed apps hide this suggestion. Dismissal lasts for the current page session.
+
+Run `npm run build` followed by `npm run preview`, then open `http://localhost:4300` to test locally. Normal `npm start` development builds do not register the service worker. On phones, use the deployed HTTPS address: an HTTP LAN IP is not a secure context for service-worker installation.
+
+After the first online visit and service-worker installation, static screens can open offline. Sign-in, plans, uploads, workout logging, and all other API actions require a connection. An offline notice explains this; writes are not queued. Tokens, API responses, private progress photos, and personalized HTML are never added to the service-worker cache. The cached navigation fallback is the empty `index.csr.html` shell. Public marketing photos under `images/landing/` are cached only after viewing them.
+
+Updates download in the background. An Arabic notice asks the user to save any changes and reload when a new version is ready; the app does not force a refresh. Returning to an open app or reconnecting checks for updates.
+
+Deploy the complete `dist/coaching-platform/browser` folder over HTTPS, including `ngsw-worker.js`, `ngsw.json`, `manifest.webmanifest`, and `icons/`. Keep real static files ahead of the SPA fallback and serve `.webmanifest` as `application/manifest+json`. Revalidate `ngsw-worker.js` and `ngsw.json` rather than caching them long term; `public/_headers` contains these rules for compatible hosts. Deploy atomically so the manifest and asset versions stay consistent. The final build script regenerates service-worker hashes after inserting the CSP into HTML; do not edit generated HTML afterward.
+
+Run `npx playwright test e2e/pwa.spec.ts` after building to check the production worker, offline navigation, API cache exclusion, icons, installation-button behavior, and iPhone instructions. OS-level installation still needs a real Android/iPhone check. Regenerate the committed brand icons with `node scripts/generate-pwa-icons.mjs`.
 
 ## Design and backend constraints
 
