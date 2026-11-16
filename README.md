@@ -77,7 +77,7 @@ The CI workflow runs these checks and a dependency audit. At implementation time
 
 ## Design and backend constraints
 
-- The reference uses placeholders for coach and transformation photos; those placeholders are retained. Replace them only after the owner supplies approved assets.
+- Five homepage photo slots are ready for coach and motivational photos. See [the photo guide](public/images/landing/PHOTO-GUIDE.md) for filenames and placement. Client transformation placeholders remain separate.
 - Arabic copy follows the supplied English reference and needs native copy review before launch.
 - Add client copies the registration link: the API has no coach-side create-client endpoint. Clients must submit their own consent during registration.
 - Profile and settings are read-only where the API provides no update endpoints.

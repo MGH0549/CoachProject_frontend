@@ -30,7 +30,6 @@ section {
   gap: 80px;
   align-items: center;
   padding-block: 70px 0;
-  margin-block-end: 120px;
 }
 .hero h1 {
   font-size: clamp(36px, 4.3vw, 64px);
@@ -66,6 +65,34 @@ section {
   aspect-ratio: 0.96;
   display: grid;
   place-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+}
+.coach-photo img,
+.motivation-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover;
+  object-position: center;
+}
+.motivation-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-block-start: 32px;
+}
+.motivation-photo {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.25;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--raised);
   color: var(--muted);
   font-size: 12px;
 }
@@ -253,10 +280,11 @@ footer {
   .coach-photo {
     aspect-ratio: 1.3;
   }
-  section {
-    margin-block-end: 75px;
+  .motivation-gallery {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
-  .hero {
+  section {
     margin-block-end: 75px;
   }
   .steps {

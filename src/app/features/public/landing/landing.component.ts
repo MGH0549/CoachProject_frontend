@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BrandComponent } from '../../../shared/brand/brand.component';
 @Component({
@@ -8,6 +8,18 @@ import { BrandComponent } from '../../../shared/brand/brand.component';
   styleUrl: './landing.component.css',
 })
 export class LandingComponent {
+  readonly coachPhoto = 'images/landing/coach.jpg';
+  readonly galleryPhotos = [
+    { src: 'images/landing/motivation-1.jpg', alt: 'المدرب أثناء التمرين' },
+    { src: 'images/landing/motivation-2.jpg', alt: 'التركيز على الأداء أثناء التدريب' },
+    { src: 'images/landing/motivation-3.jpg', alt: 'الحماس والاستمرارية في التمرين' },
+  ];
+  readonly unavailablePhotos = signal<ReadonlySet<string>>(new Set());
+
+  onPhotoError(src: string): void {
+    this.unavailablePhotos.update((photos) => new Set([...photos, src]));
+  }
+
   readonly steps = [
     { title: 'أنشئ حسابك', text: 'سجّل باسمك وبريدك الإلكتروني. يبدأ حسابك بانتظار التفعيل.' },
     { title: 'تواصل معي على واتساب', text: 'نتفق معاً على الباقة وطريقة الدفع المناسبة لك.' },

@@ -29,8 +29,19 @@
           <div><strong>أونلاين + 1:1</strong><small>طرق التدريب</small></div>
         </div>
       </div>
-      <div class="coach-photo" role="img" aria-label="موضع صورة المدرب كما في التصميم">
-        <span>صورة المدرب</span>
+      <div class="coach-photo">
+        @if (!unavailablePhotos().has(coachPhoto)) {
+          <img
+            [src]="coachPhoto"
+            alt="المدرب"
+            width="960"
+            height="1000"
+            fetchpriority="high"
+            (error)="onPhotoError(coachPhoto)"
+          />
+        } @else {
+          <span>صورة المدرب</span>
+        }
       </div>
     </section>
     <section id="how-it-works" class="steps-section">
@@ -46,6 +57,29 @@
             <h3>{{ step.title }}</h3>
             <p>{{ step.text }}</p>
           </article>
+        }
+      </div>
+    </section>
+    <section class="motivation-section" aria-labelledby="motivation-title">
+      <span class="eyebrow">كل يوم أقوى</span>
+      <h2 id="motivation-title">الشغف بالتمرين. والإصرار على التقدم.</h2>
+      <div class="motivation-gallery">
+        @for (photo of galleryPhotos; track photo.src) {
+          <div class="motivation-photo">
+            @if (!unavailablePhotos().has(photo.src)) {
+              <img
+                [src]="photo.src"
+                [alt]="photo.alt"
+                width="1000"
+                height="800"
+                loading="lazy"
+                decoding="async"
+                (error)="onPhotoError(photo.src)"
+              />
+            } @else {
+              <span>{{ photo.alt }}</span>
+            }
+          </div>
         }
       </div>
     </section>
