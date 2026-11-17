@@ -1,27 +1,27 @@
 <div class="landing">
-  <header>
-    <app-brand />
-    <nav aria-label="القائمة الرئيسية">
-      <a href="#coaching">التدريب</a><a href="#how-it-works">كيف نبدأ</a
-      ><a href="#results">النتائج</a><a href="#contact">تواصل معنا</a>
-    </nav>
-    <div class="actions">
-      <a class="btn secondary" routerLink="/auth/sign-in">تسجيل الدخول</a
-      ><a class="btn" routerLink="/auth/register">انضم الآن</a>
+  <header class="hero-banner">
+    @if (!unavailablePhotos().has(coachPhoto)) {
+      <img
+        class="hero-background"
+        [src]="coachPhoto"
+        alt=""
+        aria-hidden="true"
+        fetchpriority="high"
+        (error)="onPhotoError(coachPhoto)"
+      />
+    }
+    <div class="site-header">
+      <app-brand />
+      <nav aria-label="القائمة الرئيسية">
+        <a href="#coaching">التدريب</a><a href="#how-it-works">كيف نبدأ</a
+        ><a href="#results">النتائج</a><a href="#contact">تواصل معنا</a>
+      </nav>
+      <div class="actions">
+        <a class="btn secondary" routerLink="/auth/sign-in">تسجيل الدخول</a
+        ><a class="btn" routerLink="/auth/register">انضم الآن</a>
+      </div>
     </div>
-  </header>
-  <main>
     <section class="hero">
-      @if (!unavailablePhotos().has(coachPhoto)) {
-        <img
-          class="hero-background"
-          [src]="coachPhoto"
-          alt=""
-          aria-hidden="true"
-          fetchpriority="high"
-          (error)="onPhotoError(coachPhoto)"
-        />
-      }
       <div class="hero-copy">
         <span class="tag"><i></i> تدريب أونلاين وشخصي</span>
         <h1>تدرّب مع مدرب<br />يعرف اسمك<br />ويهتم بتقدمك.</h1>
@@ -40,6 +40,8 @@
         </div>
       </div>
     </section>
+  </header>
+  <main>
     <section id="how-it-works" class="steps-section">
       <span class="eyebrow">كيف نبدأ</span>
       <h2>أربع خطوات بسيطة للانطلاق</h2>
@@ -103,31 +105,104 @@
         }
       </div>
     </section>
-    <section id="results">
+    <section
+      id="results"
+      aria-labelledby="results-title"
+      aria-roledescription="عارض شرائح"
+      (mouseenter)="carouselHovered.set(true)"
+      (mouseleave)="carouselHovered.set(false)"
+      (focusin)="onCarouselFocus($event)"
+    >
       <span class="eyebrow">النتائج</span>
-      <h2>عملاء حقيقيون. تحولات حقيقية.</h2>
-      <div class="three-columns results">
-        @for (result of results; track result.src) {
-          <article class="card">
-            <div class="result-photo">
-              @if (result.duration) {
-                <span class="result-duration">مدة التحول: {{ result.duration }}</span>
-              }
-              @if (!unavailablePhotos().has(result.src)) {
-                <img
-                  [src]="result.src"
-                  [alt]="result.alt"
-                  loading="lazy"
-                  decoding="async"
-                  (error)="onPhotoError(result.src)"
-                />
-              } @else {
-                <span>صورة قبل / بعد</span>
-              }
-            </div>
-            <h3>{{ result.name }}</h3>
-          </article>
-        }
+      <h2 id="results-title">عملاء حقيقيون. تحولات حقيقية.</h2>
+      <div class="results-carousel">
+        <div
+          class="results-viewport"
+          (touchstart)="onResultTouchStart($event)"
+          (touchend)="onResultTouchEnd($event)"
+          (touchcancel)="onResultTouchCancel()"
+        >
+          <div
+            class="results-track"
+            [style.transform]="'translateX(' + activeResult() * 100 + '%)'"
+          >
+            @for (result of results; track result.src; let index = $index) {
+              <article
+                class="card result-slide"
+                [attr.aria-hidden]="activeResult() !== index"
+                [attr.inert]="activeResult() !== index ? '' : null"
+                role="group"
+                aria-roledescription="شريحة"
+                [attr.aria-label]="index + 1 + ' / ' + results.length"
+              >
+                <div class="result-photo">
+                  @if (result.duration) {
+                    <span class="result-duration">مدة التحول: {{ result.duration }}</span>
+                  }
+                  @if (!unavailablePhotos().has(result.src)) {
+                    <img
+                      [src]="result.src"
+                      [alt]="result.alt"
+                      loading="lazy"
+                      decoding="async"
+                      (error)="onPhotoError(result.src)"
+                    />
+                  } @else {
+                    <span>صورة قبل / بعد</span>
+                  }
+                </div>
+                <h3>{{ result.name }}</h3>
+              </article>
+            }
+          </div>
+        </div>
+        <div class="results-controls">
+          <button
+            type="button"
+            class="carousel-arrow"
+            aria-label="النتيجة السابقة"
+            (click)="changeResult(-1)"
+          >
+            →
+          </button>
+          <div class="results-dots" role="group" aria-label="اختر النتيجة">
+            @for (result of results; track result.src; let index = $index) {
+              <button
+                type="button"
+                class="carousel-dot"
+                [class.active]="activeResult() === index"
+                [attr.aria-current]="activeResult() === index ? 'true' : null"
+                [attr.aria-label]="result.name"
+                (click)="activeResult.set(index)"
+              >
+                <span></span>
+              </button>
+            }
+          </div>
+          <button
+            type="button"
+            class="carousel-arrow"
+            aria-label="النتيجة التالية"
+            (click)="changeResult(1)"
+          >
+            ←
+          </button>
+          <button
+            type="button"
+            class="carousel-play"
+            [attr.aria-label]="autoplayPaused() ? 'تشغيل العرض التلقائي' : 'إيقاف العرض التلقائي'"
+            (click)="autoplayPaused.set(!autoplayPaused())"
+          >
+            {{ autoplayPaused() ? 'تشغيل' : 'إيقاف' }}
+          </button>
+        </div>
+        <p
+          class="results-counter"
+          [attr.aria-live]="autoplayPaused() ? 'polite' : 'off'"
+          aria-atomic="true"
+        >
+          {{ activeResult() + 1 }} / {{ results.length }} · {{ results[activeResult()].name }}
+        </p>
       </div>
     </section>
     <section id="contact" class="cta">

@@ -1,13 +1,78 @@
-import { Component, signal } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BrandComponent } from '../../../shared/brand/brand.component';
 @Component({
   selector: 'app-landing',
   imports: [RouterLink, BrandComponent],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.css',
+  styleUrls: ['./landing.component.css', './results-carousel.css'],
 })
 export class LandingComponent {
+  readonly activeResult = signal(0);
+  readonly autoplayPaused = signal(false);
+  readonly carouselHovered = signal(false);
+  private touchStartX: number | null = null;
+
+  constructor() {
+    const host = inject(ElementRef<HTMLElement>);
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      const carousel = host.nativeElement.querySelector('#results');
+      if (!carousel) return;
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const onMotionChange = () => this.autoplayPaused.set(motion.matches);
+      onMotionChange();
+      motion.addEventListener('change', onMotionChange);
+      let visible = false;
+      const observer = new IntersectionObserver(([entry]) => (visible = entry.isIntersecting), {
+        threshold: 0.25,
+      });
+      observer.observe(carousel);
+      const timer = window.setInterval(() => {
+        if (visible && !document.hidden && !this.autoplayPaused() && !this.carouselHovered()) {
+          this.changeResult(1);
+        }
+      }, 1000);
+      destroyRef.onDestroy(() => {
+        window.clearInterval(timer);
+        observer.disconnect();
+        motion.removeEventListener('change', onMotionChange);
+      });
+    });
+  }
+
+  changeResult(direction: number): void {
+    this.activeResult.update(
+      (index) => (index + direction + this.results.length) % this.results.length,
+    );
+  }
+
+  onCarouselFocus(event: FocusEvent): void {
+    if (!(event.target instanceof Element) || !event.target.closest('.carousel-play')) {
+      this.autoplayPaused.set(true);
+    }
+  }
+
+  onResultTouchCancel(): void {
+    this.touchStartX = null;
+  }
+
+  onResultTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  onResultTouchEnd(event: TouchEvent): void {
+    const endX = event.changedTouches[0]?.clientX;
+    if (this.touchStartX !== null && endX !== undefined) {
+      const distance = endX - this.touchStartX;
+      if (Math.abs(distance) > 50) {
+        this.autoplayPaused.set(true);
+        this.changeResult(distance > 0 ? 1 : -1);
+      }
+    }
+    this.touchStartX = null;
+  }
+
   readonly coachPhoto = 'images/landing/coach.jpg';
   readonly galleryPhotos = [
     { src: 'images/landing/motivation-1.jpg', alt: 'المدرب أثناء التمرين' },

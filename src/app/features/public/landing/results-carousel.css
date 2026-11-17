@@ -1,0 +1,76 @@
+.results-carousel {
+  max-width: 800px;
+  margin: 32px auto 0;
+}
+.results-viewport {
+  overflow: hidden;
+  border-radius: 18px;
+  touch-action: pan-y;
+}
+.results-track {
+  display: flex;
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.result-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding: 16px;
+}
+.results-controls,
+.results-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.results-controls {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block-start: 20px;
+}
+.carousel-arrow,
+.carousel-play,
+.carousel-dot {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--raised);
+  color: var(--text);
+}
+.carousel-arrow {
+  font-size: 22px;
+}
+.carousel-play {
+  border-radius: 22px;
+  padding-inline: 16px;
+}
+.carousel-dot {
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+}
+.carousel-dot span {
+  width: 8px;
+  height: 8px;
+  border-radius: 8px;
+  background: var(--muted);
+  transition:
+    width 250ms,
+    background 250ms;
+}
+.carousel-dot.active span {
+  width: 24px;
+  background: var(--red);
+}
+.results-counter {
+  text-align: center;
+  font-size: 12px;
+  margin-block-start: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .results-track,
+  .carousel-dot span {
+    transition: none;
+  }
+}
