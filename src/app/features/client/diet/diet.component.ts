@@ -4,9 +4,11 @@ import { Diet } from '../../../core/api/models/diet';
 import { NotificationService } from '../../../core/feedback/notification.service';
 import { MealCardComponent } from '../../../shared/meal-card/meal-card.component';
 import { StatCardComponent } from '../../../shared/stat-card/stat-card.component';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MissingPlanComponent } from '../../../shared/missing-plan/missing-plan.component';
 @Component({
   selector: 'app-diet',
-  imports: [MealCardComponent, StatCardComponent],
+  imports: [MealCardComponent, StatCardComponent, MissingPlanComponent],
   templateUrl: './diet.component.html',
   styleUrl: './diet.component.css',
 })
@@ -26,7 +28,11 @@ export class DietComponent {
     try {
       this.plan.set(await this.api.load());
     } catch (error) {
-      this.error.set(this.notices.error(error));
+      if (error instanceof HttpErrorResponse && error.status === 404) {
+        this.plan.set(null);
+      } else {
+        this.error.set(this.notices.error(error));
+      }
     } finally {
       this.loading.set(false);
     }

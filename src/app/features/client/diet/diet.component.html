@@ -49,5 +49,7 @@
         <p class="empty">لم يضف المدرب وجبات بعد.</p>
       }
     </div>
+  } @else {
+    <app-missing-plan kind="diet" (check)="load()" />
   }
 </div>

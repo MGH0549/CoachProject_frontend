@@ -107,5 +107,5 @@
     }
   </div>
 } @else {
-  <p class="empty">سيضيف المدرب خطتك قريباً.</p>
+  <app-missing-plan kind="training" (check)="load()" />
 }

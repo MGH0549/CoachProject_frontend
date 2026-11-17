@@ -5,9 +5,11 @@ import { Placement } from '../../../core/api/models/placement';
 import { NotificationService } from '../../../core/feedback/notification.service';
 import { VideoPanelComponent } from '../../../shared/video-panel/video-panel.component';
 import { SessionService } from '../../../core/auth/session.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { MissingPlanComponent } from '../../../shared/missing-plan/missing-plan.component';
 @Component({
   selector: 'app-training',
-  imports: [VideoPanelComponent],
+  imports: [VideoPanelComponent, MissingPlanComponent],
   templateUrl: './training.component.html',
   styleUrl: './training.component.css',
 })
@@ -39,7 +41,11 @@ export class TrainingComponent {
     try {
       this.plan.set(await this.api.load());
     } catch (error) {
-      this.error.set(this.notices.error(error));
+      if (error instanceof HttpErrorResponse && error.status === 404) {
+        this.plan.set(null);
+      } else {
+        this.error.set(this.notices.error(error));
+      }
     } finally {
       this.loading.set(false);
     }
