@@ -29,7 +29,7 @@ export class ProfileComponent {
       );
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'apex-personal-data.json';
+      link.download = 'forma-personal-data.json';
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       this.notices.show('تم تنزيل نسخة من بياناتك. احتفظ بها في مكان آمن.');

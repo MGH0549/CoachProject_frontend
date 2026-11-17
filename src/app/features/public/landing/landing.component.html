@@ -12,6 +12,16 @@
   </header>
   <main>
     <section class="hero">
+      @if (!unavailablePhotos().has(coachPhoto)) {
+        <img
+          class="hero-background"
+          [src]="coachPhoto"
+          alt=""
+          aria-hidden="true"
+          fetchpriority="high"
+          (error)="onPhotoError(coachPhoto)"
+        />
+      }
       <div class="hero-copy">
         <span class="tag"><i></i> تدريب أونلاين وشخصي</span>
         <h1>تدرّب مع مدرب<br />يعرف اسمك<br />ويهتم بتقدمك.</h1>
@@ -28,20 +38,6 @@
           <div><strong>10 سنوات</strong><small>من الخبرة</small></div>
           <div><strong>أونلاين + 1:1</strong><small>طرق التدريب</small></div>
         </div>
-      </div>
-      <div class="coach-photo">
-        @if (!unavailablePhotos().has(coachPhoto)) {
-          <img
-            [src]="coachPhoto"
-            alt="المدرب"
-            width="960"
-            height="1000"
-            fetchpriority="high"
-            (error)="onPhotoError(coachPhoto)"
-          />
-        } @else {
-          <span>صورة المدرب</span>
-        }
       </div>
     </section>
     <section id="how-it-works" class="steps-section">
@@ -60,7 +56,7 @@
         }
       </div>
     </section>
-    <section class="motivation-section" aria-labelledby="motivation-title">
+    <!-- <section class="motivation-section" aria-labelledby="motivation-title">
       <span class="eyebrow">كل يوم أقوى</span>
       <h2 id="motivation-title">الشغف بالتمرين. والإصرار على التقدم.</h2>
       <div class="motivation-gallery">
@@ -82,7 +78,7 @@
           </div>
         }
       </div>
-    </section>
+    </section> -->
     <section id="coaching">
       <span class="eyebrow">التدريب</span>
       <h2>اختر الطريقة المناسبة لك</h2>
@@ -111,12 +107,25 @@
       <span class="eyebrow">النتائج</span>
       <h2>عملاء حقيقيون. تحولات حقيقية.</h2>
       <div class="three-columns results">
-        @for (result of results; track result.name) {
+        @for (result of results; track result.src) {
           <article class="card">
-            <div class="result-photo">صورة قبل / بعد</div>
+            <div class="result-photo">
+              @if (result.duration) {
+                <span class="result-duration">مدة التحول: {{ result.duration }}</span>
+              }
+              @if (!unavailablePhotos().has(result.src)) {
+                <img
+                  [src]="result.src"
+                  [alt]="result.alt"
+                  loading="lazy"
+                  decoding="async"
+                  (error)="onPhotoError(result.src)"
+                />
+              } @else {
+                <span>صورة قبل / بعد</span>
+              }
+            </div>
             <h3>{{ result.name }}</h3>
-            <span class="result-caption">{{ result.result }}</span>
-            <p>«{{ result.quote }}»</p>
           </article>
         }
       </div>
@@ -129,7 +138,7 @@
   </main>
   <footer>
     <span
-      >© {{ 2026 }} Apex Coaching · <a routerLink="/privacy">الخصوصية</a> ·
+      >© {{ 2026 }} FORMA · <a routerLink="/privacy">الخصوصية</a> ·
       <a routerLink="/terms">الشروط</a></span
     ><span>التدريب أونلاين · التدريب الشخصي</span>
   </footer>

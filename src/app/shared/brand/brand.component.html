@@ -1,4 +1,15 @@
-<a class="brand" routerLink="/" aria-label="أبيكس كوتشينج، الصفحة الرئيسية" dir="ltr"
-  ><span class="mark" aria-hidden="true"></span
-  ><span>{{ compact() ? 'APEX' : 'APEX COACHING' }}</span></a
->
+<a class="brand" routerLink="/" aria-label="فورما، الصفحة الرئيسية" dir="ltr">
+  @if (!logoUnavailable()) {
+    <img
+      class="logo"
+      [src]="logoPhoto"
+      alt=""
+      width="44"
+      height="44"
+      (error)="logoUnavailable.set(true)"
+    />
+  } @else {
+    <span class="mark" aria-hidden="true"></span>
+  }
+  <span>FORMA</span>
+</a>

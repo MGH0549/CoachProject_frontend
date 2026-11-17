@@ -1,4 +1,4 @@
-# APEX Coaching — Angular frontend
+# FORMA — Angular frontend
 
 Arabic RTL frontend based on the supplied UI/UX PNG export. The user approved applying the same style to password recovery, profile/privacy, coach feedback, and settings where the export has no layouts.
 

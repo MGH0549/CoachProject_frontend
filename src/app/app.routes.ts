@@ -8,7 +8,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    title: 'APEX Coaching | تدريب شخصي',
+    title: 'FORMA | تدريب شخصي',
     loadComponent: () =>
       import('./features/public/landing/landing.component').then((m) => m.LandingComponent),
   },

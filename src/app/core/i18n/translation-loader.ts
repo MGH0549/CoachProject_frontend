@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 export class TranslationLoader implements TranslocoLoader {
   getTranslation() {
     return of({
-      brand: 'APEX COACHING',
+      brand: 'FORMA',
       training: 'الخطة التدريبية',
       diet: 'النظام الغذائي',
       progress: 'التقدم',

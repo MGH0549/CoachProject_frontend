@@ -25,11 +25,60 @@ section {
   margin-block-end: 120px;
 }
 .hero {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 80px;
-  align-items: center;
-  padding-block: 70px 0;
+  place-items: center;
+  min-height: 720px;
+  padding: 80px 32px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: var(--raised);
+  text-align: center;
+}
+.hero-background {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+  animation: hero-reveal 1.6s ease-out both;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, #0a0a0a66, #0a0a0a99 45%, #0a0a0ae6);
+}
+.hero-copy {
+  width: 100%;
+  max-width: 700px;
+  color: #fff;
+}
+.hero-copy > * {
+  animation: hero-copy-in 800ms ease-out both;
+}
+.hero-copy h1 {
+  animation-delay: 100ms;
+}
+.hero-copy > p {
+  animation-delay: 200ms;
+}
+.hero-copy > .actions {
+  justify-content: center;
+  flex-wrap: wrap;
+  animation-delay: 300ms;
+}
+.hero-copy > .hero-stats {
+  animation-delay: 400ms;
+}
+.hero-copy > p,
+.hero-stats small {
+  color: #e5e5e5;
 }
 .hero h1 {
   font-size: clamp(36px, 4.3vw, 64px);
@@ -38,7 +87,8 @@ section {
   margin-block: 20px 24px;
 }
 .hero-copy > p {
-  max-width: 480px;
+  max-width: 560px;
+  margin-inline: auto;
   margin-block-end: 24px;
   line-height: 1.9;
 }
@@ -58,18 +108,6 @@ section {
   background: var(--red);
   border-radius: 50%;
 }
-.coach-photo {
-  background: var(--raised);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  aspect-ratio: 0.96;
-  display: grid;
-  place-items: center;
-  color: var(--muted);
-  font-size: 12px;
-  overflow: hidden;
-}
-.coach-photo img,
 .motivation-photo img {
   display: block;
   width: 100%;
@@ -98,6 +136,8 @@ section {
 }
 .hero-stats {
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 36px;
   margin-block-start: 30px;
 }
@@ -164,8 +204,7 @@ section {
 .package p {
   font-size: 12px;
 }
-.price,
-.result-caption {
+.price {
   color: var(--red);
   font-size: 11px;
   margin-block-start: 14px;
@@ -189,6 +228,7 @@ section {
   padding: 16px;
 }
 .result-photo {
+  position: relative;
   background: var(--raised);
   border-radius: 12px;
   aspect-ratio: 1.45;
@@ -197,10 +237,29 @@ section {
   color: var(--muted);
   font-size: 11px;
   margin-block-end: 14px;
+  overflow: hidden;
 }
-.results p {
+.result-duration {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-start: 10px;
+  z-index: 1;
+  padding: 5px 12px;
+  border: 1px solid #ffffff33;
+  border-radius: 20px;
+  background: #0a0a0aeb;
+  color: #fff;
   font-size: 12px;
-  margin-block-start: 12px;
+  font-weight: 700;
+  max-width: calc(100% - 20px);
+}
+.result-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
 }
 .cta {
   background: var(--action-red);
@@ -234,9 +293,6 @@ footer {
   header nav {
     display: none;
   }
-  .hero {
-    gap: 35px;
-  }
   .steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -263,22 +319,18 @@ footer {
     font-size: 10px;
   }
   .hero {
-    padding-block: 40px 0;
-    grid-template-columns: 1fr;
-    gap: 35px;
+    min-height: 660px;
+    padding: 56px 20px;
+    border-radius: 18px;
   }
   .hero h1 {
-    font-size: 43px;
+    font-size: clamp(32px, 8vw, 43px);
   }
   .hero-stats {
-    justify-content: space-between;
-    gap: 8px;
+    gap: 16px;
   }
   .hero-stats strong {
     font-size: 18px;
-  }
-  .coach-photo {
-    aspect-ratio: 1.3;
   }
   .motivation-gallery {
     grid-template-columns: 1fr;
@@ -302,5 +354,29 @@ footer {
   }
   footer {
     flex-direction: column;
+  }
+}
+@keyframes hero-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes hero-reveal {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-background,
+  .hero-copy > * {
+    animation: none;
   }
 }

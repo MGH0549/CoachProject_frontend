@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -9,4 +9,6 @@ import { RouterLink } from '@angular/router';
 })
 export class BrandComponent {
   readonly compact = input(false);
+  readonly logoPhoto = 'images/brand/logo.png';
+  readonly logoUnavailable = signal(false);
 }
