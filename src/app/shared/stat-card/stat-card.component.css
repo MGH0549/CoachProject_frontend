@@ -10,11 +10,11 @@
   line-height: 1.5;
 }
 .stat span {
-  color: var(--green);
+  color: var(--green-text);
   font-size: 11px;
   margin-inline-start: 5px;
 }
 .stat p {
-  color: var(--green);
+  color: var(--green-text);
   font-size: 10px;
 }

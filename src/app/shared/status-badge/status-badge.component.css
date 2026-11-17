@@ -9,12 +9,12 @@
   white-space: nowrap;
 }
 .Pending {
-  color: var(--amber);
+  color: var(--amber-text);
 }
 .Active {
-  color: var(--green);
+  color: var(--green-text);
 }
 .Expired,
 .Deactivated {
-  color: #ff8c98;
+  color: var(--danger-text);
 }

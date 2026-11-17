@@ -22,3 +22,8 @@
   background: var(--red);
   border-radius: 7px;
 }
+:host {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}

@@ -82,6 +82,9 @@ main {
 .mobile-nav {
   display: none;
 }
+.mobile-theme {
+  display: none;
+}
 .skip-link {
   position: fixed;
   inset-block-start: -80px;
@@ -93,6 +96,11 @@ main {
   inset-block-start: 0;
 }
 @media (max-width: 760px) {
+  .mobile-theme {
+    display: flex;
+    justify-content: flex-end;
+    margin-block-end: 16px;
+  }
   .app-layout {
     display: block;
   }

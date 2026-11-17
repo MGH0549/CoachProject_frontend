@@ -170,11 +170,11 @@ input[type='checkbox'] {
   gap: 14px;
 }
 .error {
-  color: #ff9ca8;
+  color: var(--error-text);
   font-size: 12px;
 }
 .success {
-  color: var(--green);
+  color: var(--green-text);
 }
 .page-header {
   display: flex;
@@ -214,9 +214,9 @@ input[type='checkbox'] {
   border-color: var(--red);
 }
 .diet .pill.active {
-  background: #113e29;
+  background: var(--green-selected);
   border-color: var(--green);
-  color: var(--green);
+  color: var(--green-text);
 }
 .empty {
   padding: 55px 20px;
@@ -261,7 +261,7 @@ th {
   background: var(--surface);
 }
 tbody tr:nth-child(2n) {
-  background: #101012;
+  background: var(--table-stripe);
 }
 tbody tr:last-child td {
   border: 0;
@@ -332,7 +332,7 @@ tbody tr:last-child td {
 }
 .check-list li:before {
   content: '✓';
-  color: var(--green);
+  color: var(--green-text);
   margin-inline-end: 8px;
 }
 .mobile-only {

@@ -16,7 +16,7 @@
 }
 .eyebrow,
 .add {
-  color: var(--green);
+  color: var(--green-text);
 }
 .meals {
   padding: 14px;
@@ -33,7 +33,7 @@
   margin-block: 10px;
 }
 .meal-button.active {
-  background: #12261a;
+  background: var(--green-surface);
   border-color: var(--green);
 }
 .meal-button small {

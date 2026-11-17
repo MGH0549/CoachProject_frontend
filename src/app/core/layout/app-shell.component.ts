@@ -6,6 +6,7 @@ import { SessionService } from '../auth/session.service';
 import { NotificationService } from '../feedback/notification.service';
 import { BrandComponent } from '../../shared/brand/brand.component';
 import { CairoDatePipe } from '../../shared/pipes/cairo-date.pipe';
+import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 @Component({
   selector: 'app-shell',
   imports: [
@@ -14,6 +15,7 @@ import { CairoDatePipe } from '../../shared/pipes/cairo-date.pipe';
     RouterLinkActive,
     RouterOutlet,
     BrandComponent,
+    ThemeToggleComponent,
     CairoDatePipe,
     TranslocoPipe,
   ],

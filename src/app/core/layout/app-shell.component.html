@@ -26,7 +26,10 @@
     </div>
     <button class="logout" (click)="signOut()">{{ 'signOut' | transloco }}</button>
   </aside>
-  <main id="main-content" tabindex="-1"><router-outlet /></main>
+  <main id="main-content" tabindex="-1">
+    <div class="mobile-theme"><app-theme-toggle /></div>
+    <router-outlet />
+  </main>
 </div>
 <nav class="mobile-nav" aria-label="التنقل على الهاتف">
   @for (link of links; track link.path) {

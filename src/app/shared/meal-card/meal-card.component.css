@@ -5,7 +5,7 @@ header {
   gap: 12px;
 }
 header strong {
-  color: var(--green);
+  color: var(--green-text);
   font-size: 13px;
 }
 header small {
@@ -25,8 +25,8 @@ header small {
   margin-block-start: 15px;
 }
 .locked {
-  color: #ff8c98;
-  background: #2c1118;
+  color: var(--danger-text);
+  background: var(--danger-surface);
   border-radius: 12px;
   font-size: 10px;
   padding: 4px 10px;
