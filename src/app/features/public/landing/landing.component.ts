@@ -134,6 +134,11 @@ export class LandingComponent {
       name: 'التحول الثالث',
       duration: '80 أسبوعاً',
       alt: 'صور التحول الثالث قبل وبعد التدريب',
+    }, {
+      src: 'images/results/result-4.jpg',
+      name: 'التحول الرابع',
+      duration: '4 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
     },
   ];
 }

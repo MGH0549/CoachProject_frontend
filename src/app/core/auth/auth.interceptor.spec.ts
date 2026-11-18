@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { API_BASE_URL } from '../config/api-base-url.token';
 import { TokenStore } from './token-store.service';
 import { authInterceptor } from './auth.interceptor';
@@ -42,5 +42,42 @@ describe('Access token interceptor', () => {
     const request = TestBed.inject(HttpTestingController).expectOne('https://example.com');
     expect(request.request.headers.has('Authorization')).toBe(false);
     request.flush({});
+  });
+  it('does not redirect or clear the session when refresh temporarily fails', async () => {
+    const http = TestBed.inject(HttpClient);
+    const testing = TestBed.inject(HttpTestingController);
+    const tokens = TestBed.inject(TokenStore);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    tokens.token.set('expired');
+    const failure = vi.fn();
+    http.get('http://localhost:3000/api/v1/me/training').subscribe({ error: failure });
+    testing
+      .expectOne('http://localhost:3000/api/v1/me/training')
+      .flush({}, { status: 401, statusText: 'Expired' });
+    testing
+      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .flush({}, { status: 503, statusText: 'Unavailable' });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(failure).toHaveBeenCalledOnce();
+    expect(navigate).not.toHaveBeenCalled();
+    expect(tokens.token()).toBe('expired');
+  });
+  it('redirects only after the refresh endpoint rejects the session', async () => {
+    const testing = TestBed.inject(HttpTestingController);
+    const tokens = TestBed.inject(TokenStore);
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    tokens.token.set('expired');
+    TestBed.inject(HttpClient)
+      .get('http://localhost:3000/api/v1/me/training')
+      .subscribe({ error: () => undefined });
+    testing
+      .expectOne('http://localhost:3000/api/v1/me/training')
+      .flush({}, { status: 401, statusText: 'Expired' });
+    testing
+      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .flush({}, { status: 401, statusText: 'Invalid session' });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(navigate).toHaveBeenCalledOnce();
+    expect(tokens.token()).toBeNull();
   });
 });

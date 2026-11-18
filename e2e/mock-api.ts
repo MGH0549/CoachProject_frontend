@@ -54,7 +54,7 @@ export async function mockApi(
     `header.${Buffer.from(JSON.stringify({ role: state.role, sub: 'test-user' })).toString('base64url')}.signature`;
   const paged = (items: unknown[]) => ({ items, page: 1, pageSize: 20, total: items.length });
   // Context routes also intercept network requests forwarded by the production service worker.
-  await page.context().route('http://localhost:3000/api/v1/**', async (route) => {
+  await page.context().route('**/api/v1/**', async (route) => {
     const request = route.request(),
       path = new URL(request.url()).pathname.replace('/api/v1', ''),
       method = request.method();

@@ -46,4 +46,19 @@ describe('Rotating refresh session', () => {
       .flush({ accessToken: 'recovered', expiresIn: 900 });
     expect(await next).toBe('recovered');
   });
+  it.each([0, 403, 429, 500, 503])(
+    'preserves the token for a non-session refresh failure (%s)',
+    async (status) => {
+      const refresh = TestBed.inject(RefreshService);
+      const tokens = TestBed.inject(TokenStore);
+      tokens.token.set('existing-access');
+      const failed = expect(refresh.refresh()).rejects.toBeTruthy();
+      const request = TestBed.inject(HttpTestingController).expectOne(
+        'http://localhost:3000/api/v1/auth/refresh',
+      );
+      request.flush({}, { status, statusText: 'Refresh unavailable' });
+      await failed;
+      expect(tokens.token()).toBe('existing-access');
+    },
+  );
 });

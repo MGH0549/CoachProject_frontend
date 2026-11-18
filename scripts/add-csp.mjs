@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { environment } from '../src/environments/environment.ts';
+import { environment } from '../src/environments/environment.production.ts';
 const root = 'dist/coaching-platform/browser';
 async function processDirectory(directory) {
   for (const item of await readdir(directory, { withFileTypes: true })) {

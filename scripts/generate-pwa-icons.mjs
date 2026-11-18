@@ -16,13 +16,18 @@ try {
     ['favicon-48.png', 48, 0.94],
   ]) {
     const data = await page.evaluate(
-      async ({ source, size, scale }) => {
+      async ({ source, size, scale, rounded }) => {
         const image = new Image();
         image.src = source;
         await image.decode();
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = size;
         const context = canvas.getContext('2d');
+        if (rounded) {
+          context.beginPath();
+          context.roundRect(0, 0, size, size, size * 0.24);
+          context.clip();
+        }
         context.fillStyle = '#0a0a0a';
         context.fillRect(0, 0, size, size);
         context.imageSmoothingQuality = 'high';
@@ -32,7 +37,13 @@ try {
         context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
         return canvas.toDataURL('image/png').split(',')[1];
       },
-      { source: `data:image/png;base64,${logo.toString('base64')}`, size, scale },
+      {
+        source: `data:image/png;base64,${logo.toString('base64')}`,
+        size,
+        scale,
+        // Apple and Android maskable icons receive their final shape from the OS.
+        rounded: !['icon-maskable-512.png', 'apple-touch-icon.png'].includes(name),
+      },
     );
     await writeFile(`public/icons/${name}`, Buffer.from(data, 'base64'));
   }
