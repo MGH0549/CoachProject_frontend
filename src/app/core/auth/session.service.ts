@@ -1,4 +1,4 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthenticationService } from '../api/services/authentication.service';
 import { ClientService } from '../api/services/client.service';
@@ -8,6 +8,9 @@ import { RefreshService } from './refresh.service';
 import { TokenStore } from './token-store.service';
 import { withAuthSessionLock } from './auth-session-lock';
 import { AuthDiagnostics } from './auth-diagnostics.service';
+import { sessionRejected } from './session-rejected';
+
+export type SessionState = 'checking' | 'authenticated' | 'unauthenticated' | 'unavailable';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
@@ -17,16 +20,62 @@ export class SessionService {
   private readonly diagnostics = inject(AuthDiagnostics);
   readonly tokens = inject(TokenStore);
   readonly account = signal<Account | null>(null);
+  readonly state = signal<SessionState>('checking');
+  readonly restorationError = signal('');
   private restored: Promise<void> | null = null;
+  private resolveReady!: () => void;
+  private readonly ready = new Promise<void>((resolve) => (this.resolveReady = resolve));
+
+  constructor() {
+    effect(() => {
+      if (this.state() === 'authenticated' && !this.tokens.token()) this.markSignedOut();
+    });
+  }
+
+  /** Guards wait for a definite result, including across a temporary startup outage. */
+  waitUntilReady(): Promise<void> {
+    if (this.state() === 'checking' && !this.restored) void this.restore();
+    return this.ready;
+  }
+
   restore(): Promise<void> {
-    return (this.restored ??= this.refresh
-      .refresh()
-      .then(() => this.loadAccount())
-      .catch(() => {
-        // A transient outage during startup must not permanently disable restoration.
+    if (this.restored) return this.restored;
+    if (this.state() === 'authenticated' || this.state() === 'unauthenticated')
+      return Promise.resolve();
+    this.state.set('checking');
+    this.restorationError.set('');
+    this.restored = this.restoreAttempt().finally(() => {
+      if (this.state() === 'unavailable') {
         this.restored = null;
+      }
+    });
+    return this.restored;
+  }
+
+  private async restoreAttempt(): Promise<void> {
+    try {
+      if (!this.tokens.token()) await this.refresh.refresh();
+      await this.loadAccount();
+      this.state.set('authenticated');
+      this.resolveReady();
+    } catch (error) {
+      if (sessionRejected(error)) {
+        this.markSignedOut();
+      } else {
+        this.state.set('unavailable');
+        this.restorationError.set(
+          'تعذر التحقق من جلستك الآن. تحقق من اتصال الإنترنت ثم أعد المحاولة. لم يتم تسجيل خروجك.',
+        );
         this.diagnostics.log('session_restoration_failed');
-      }));
+      }
+    }
+  }
+
+  private markSignedOut(): void {
+    this.tokens.token.set(null);
+    this.account.set(null);
+    this.state.set('unauthenticated');
+    this.resolveReady();
   }
   async signIn(body: LoginDto): Promise<void> {
     await this.restore();
@@ -36,6 +85,8 @@ export class SessionService {
       this.diagnostics.log('sign_in_succeeded', { expiresAt: this.tokens.expiresAt() });
     });
     await this.loadAccount();
+    this.state.set('authenticated');
+    this.resolveReady();
     this.restored = Promise.resolve();
   }
   async loadAccount(): Promise<void> {
@@ -46,8 +97,7 @@ export class SessionService {
     this.diagnostics.log('logout_triggered', { reason: 'user_requested' });
     await withAuthSessionLock(async () => {
       await firstValueFrom(this.api.authControllerLogout());
-      this.tokens.token.set(null);
-      this.account.set(null);
+      this.markSignedOut();
       this.restored = null;
     });
   }

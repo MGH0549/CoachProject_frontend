@@ -1,4 +1,5 @@
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal } from '@angular/core';
+import { SessionService } from '../../../core/auth/session.service';
 import { RouterLink } from '@angular/router';
 import { BrandComponent } from '../../../shared/brand/brand.component';
 @Component({
@@ -8,6 +9,8 @@ import { BrandComponent } from '../../../shared/brand/brand.component';
   styleUrls: ['./landing.component.css', './results-carousel.css'],
 })
 export class LandingComponent {
+  readonly session = inject(SessionService);
+  readonly browserReady = signal(false);
   readonly activeResult = signal(0);
   readonly autoplayPaused = signal(false);
   readonly carouselHovered = signal(false);
@@ -17,6 +20,7 @@ export class LandingComponent {
     const host = inject(ElementRef<HTMLElement>);
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
+      this.browserReady.set(true);
       const carousel = host.nativeElement.querySelector('#results');
       if (!carousel) return;
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -134,7 +138,8 @@ export class LandingComponent {
       name: 'التحول الثالث',
       duration: '80 أسبوعاً',
       alt: 'صور التحول الثالث قبل وبعد التدريب',
-    }, {
+    },
+    {
       src: 'images/results/result-4.jpg',
       name: 'التحول الرابع',
       duration: '4 أسابيع',

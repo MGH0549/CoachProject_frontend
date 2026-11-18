@@ -5,6 +5,6 @@ import { SessionService } from './session.service';
 export const roleGuard: CanActivateFn = async (route) => {
   const session = inject(SessionService);
   const router = inject(Router);
-  await session.restore();
+  await session.waitUntilReady();
   return session.tokens.role() === route.data['role'] || router.parseUrl(session.home());
 };

@@ -4,7 +4,7 @@ import { SessionService } from './session.service';
 export const pendingGuard: CanActivateFn = async () => {
   const session = inject(SessionService),
     router = inject(Router);
-  await session.restore();
+  await session.waitUntilReady();
   return session.tokens.role() === 'Coach' || session.account()?.status === 'Active'
     ? router.parseUrl(session.home())
     : true;

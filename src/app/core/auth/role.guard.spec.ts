@@ -13,7 +13,11 @@ describe('Role guard session ordering', () => {
         provideRouter([]),
         {
           provide: SessionService,
-          useValue: { restore: () => restoring, tokens: { role }, home: () => '/auth/pending' },
+          useValue: {
+            waitUntilReady: () => restoring,
+            tokens: { role },
+            home: () => '/auth/pending',
+          },
         },
       ],
     });

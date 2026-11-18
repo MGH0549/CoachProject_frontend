@@ -17,8 +17,12 @@
         ><a href="#results">النتائج</a><a href="#contact">تواصل معنا</a>
       </nav>
       <div class="actions">
-        <a class="btn secondary" routerLink="/auth/sign-in">تسجيل الدخول</a
-        ><a class="btn" routerLink="/auth/register">انضم الآن</a>
+        @if (browserReady() && session.state() === 'authenticated') {
+          <a class="btn" [routerLink]="session.home()">لوحة التحكم</a>
+        } @else {
+          <a class="btn secondary" routerLink="/auth/sign-in">تسجيل الدخول</a
+          ><a class="btn" routerLink="/auth/register">انضم الآن</a>
+        }
       </div>
     </div>
     <section class="hero">

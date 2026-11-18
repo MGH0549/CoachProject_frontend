@@ -1,5 +1,22 @@
 <app-pwa-status />
-<router-outlet />
+@if (browserReady() && session.state() === 'checking') {
+  <div class="session-recovery" role="status" aria-live="polite">
+    <h1>جارٍ استعادة جلستك…</h1>
+    <p>نتحقق من حسابك لتكمل من حيث توقفت.</p>
+  </div>
+}
+@if (browserReady() && session.state() === 'unavailable') {
+  <main class="session-recovery" aria-labelledby="session-recovery-title">
+    <h1 id="session-recovery-title">تعذر الاتصال لاستعادة جلستك</h1>
+    <p role="status">{{ session.restorationError() }}</p>
+    <button type="button" class="btn" (click)="session.restore()">إعادة المحاولة</button>
+  </main>
+}
+<div
+  [hidden]="browserReady() && (session.state() === 'checking' || session.state() === 'unavailable')"
+>
+  <router-outlet />
+</div>
 @if (notices.message()) {
   <div
     class="toast"

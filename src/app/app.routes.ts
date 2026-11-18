@@ -4,6 +4,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
 import { activeGuard } from './core/auth/active.guard';
+import { guestGuard } from './core/auth/guest.guard';
 export const routes: Routes = [
   {
     path: '',
@@ -40,6 +41,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'sign-in',
+        canActivate: [guestGuard],
         title: 'تسجيل الدخول',
         loadComponent: () =>
           import('./features/auth/sign-in/sign-in.component').then((m) => m.SignInComponent),

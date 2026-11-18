@@ -34,6 +34,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([apiCredentialsInterceptor, authInterceptor])),
     { provide: ErrorHandler, useClass: AppErrorHandler },
     provideAppInitializer(() => {
+      // Start once without blocking the recovery UI. Guards await waitUntilReady(),
+      // which resolves only for authenticated/explicitly unauthenticated sessions.
       if (isPlatformBrowser(inject(PLATFORM_ID))) void inject(SessionService).restore();
     }),
     provideTransloco({

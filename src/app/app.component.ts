@@ -1,7 +1,8 @@
 import { NotificationService } from './core/feedback/notification.service';
-import { Component, inject } from '@angular/core';
+import { afterNextRender, Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { PwaStatusComponent } from './shared/pwa-status/pwa-status.component';
+import { SessionService } from './core/auth/session.service';
 
 @Component({
   imports: [RouterOutlet, PwaStatusComponent],
@@ -11,4 +12,9 @@ import { PwaStatusComponent } from './shared/pwa-status/pwa-status.component';
 })
 export class AppComponent {
   readonly notices = inject(NotificationService);
+  readonly session = inject(SessionService);
+  readonly browserReady = signal(false);
+  constructor() {
+    afterNextRender(() => this.browserReady.set(true));
+  }
 }

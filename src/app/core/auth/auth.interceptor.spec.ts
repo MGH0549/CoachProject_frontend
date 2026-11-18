@@ -12,7 +12,7 @@ describe('Access token interceptor', () => {
         provideHttpClient(withInterceptors([authInterceptor])),
         provideHttpClientTesting(),
         provideRouter([]),
-        { provide: API_BASE_URL, useValue: 'http://localhost:3000/api' },
+        { provide: API_BASE_URL, useValue: '${environment.apiBaseUrl}' },
       ],
     }),
   );
@@ -22,13 +22,13 @@ describe('Access token interceptor', () => {
       testing = TestBed.inject(HttpTestingController);
     TestBed.inject(TokenStore).token.set('expired');
     const values: unknown[] = [];
-    http.get('http://localhost:3000/api/v1/me/training').subscribe((v) => values.push(v));
-    http.get('http://localhost:3000/api/v1/me/diet').subscribe((v) => values.push(v));
+    http.get('${environment.apiBaseUrl}/v1/me/training').subscribe((v) => values.push(v));
+    http.get('${environment.apiBaseUrl}/v1/me/diet').subscribe((v) => values.push(v));
     const initial = testing.match((r) => r.headers.get('Authorization') === 'Bearer expired');
     expect(initial).toHaveLength(2);
     initial.forEach((r) => r.flush({}, { status: 401, statusText: 'Unauthorized' }));
     testing
-      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .expectOne('${environment.apiBaseUrl}/v1/auth/refresh')
       .flush({ accessToken: 'fresh', expiresIn: 900 });
     await new Promise((resolve) => setTimeout(resolve, 0));
     const retried = testing.match((r) => r.headers.get('Authorization') === 'Bearer fresh');
@@ -50,12 +50,12 @@ describe('Access token interceptor', () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     tokens.token.set('expired');
     const failure = vi.fn();
-    http.get('http://localhost:3000/api/v1/me/training').subscribe({ error: failure });
+    http.get('${environment.apiBaseUrl}/v1/me/training').subscribe({ error: failure });
     testing
-      .expectOne('http://localhost:3000/api/v1/me/training')
+      .expectOne('${environment.apiBaseUrl}/v1/me/training')
       .flush({}, { status: 401, statusText: 'Expired' });
     testing
-      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .expectOne('${environment.apiBaseUrl}/v1/auth/refresh')
       .flush({}, { status: 503, statusText: 'Unavailable' });
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(failure).toHaveBeenCalledOnce();
@@ -68,13 +68,13 @@ describe('Access token interceptor', () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
     tokens.token.set('expired');
     TestBed.inject(HttpClient)
-      .get('http://localhost:3000/api/v1/me/training')
+      .get('${environment.apiBaseUrl}/v1/me/training')
       .subscribe({ error: () => undefined });
     testing
-      .expectOne('http://localhost:3000/api/v1/me/training')
+      .expectOne('${environment.apiBaseUrl}/v1/me/training')
       .flush({}, { status: 401, statusText: 'Expired' });
     testing
-      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .expectOne('${environment.apiBaseUrl}/v1/auth/refresh')
       .flush({}, { status: 401, statusText: 'Invalid session' });
     await new Promise((resolve) => setTimeout(resolve, 0));
     expect(navigate).toHaveBeenCalledOnce();

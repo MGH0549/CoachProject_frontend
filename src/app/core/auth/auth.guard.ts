@@ -5,7 +5,7 @@ import { SessionService } from './session.service';
 export const authGuard: CanActivateFn = async (_route, state) => {
   const session = inject(SessionService);
   const router = inject(Router);
-  await session.restore();
+  await session.waitUntilReady();
   return (
     !!session.tokens.token() ||
     router.createUrlTree(['/auth/sign-in'], { queryParams: { returnUrl: state.url } })
