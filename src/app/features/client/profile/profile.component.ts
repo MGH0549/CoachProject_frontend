@@ -6,9 +6,10 @@ import { SessionService } from '../../../core/auth/session.service';
 import { NotificationService } from '../../../core/feedback/notification.service';
 import { CairoDatePipe } from '../../../shared/pipes/cairo-date.pipe';
 import { StatusBadgeComponent } from '../../../shared/status-badge/status-badge.component';
+import { MobileSignOutComponent } from '../../../shared/mobile-sign-out/mobile-sign-out.component';
 @Component({
   selector: 'app-profile',
-  imports: [FormsModule, RouterLink, CairoDatePipe, StatusBadgeComponent],
+  imports: [FormsModule, RouterLink, CairoDatePipe, StatusBadgeComponent, MobileSignOutComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css',
 })

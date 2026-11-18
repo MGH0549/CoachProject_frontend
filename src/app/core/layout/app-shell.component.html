@@ -34,10 +34,9 @@
 <nav class="mobile-nav" aria-label="التنقل على الهاتف">
   @for (link of links; track link.path) {
     <a [routerLink]="link.path" routerLinkActive="active"
-      ><app-icon [name]="link.label" />{{ link.label | transloco }}</a
+      ><app-icon [name]="link.label === 'profile' ? 'settings' : link.label" /><span>{{
+        (link.label === 'profile' ? 'settings' : link.label) | transloco
+      }}</span></a
     >
   }
-  <button (click)="signOut()" aria-label="تسجيل الخروج">
-    <span aria-hidden="true">⇥</span>خروج
-  </button>
 </nav>

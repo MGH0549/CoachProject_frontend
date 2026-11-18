@@ -328,16 +328,19 @@ footer {
     padding-inline: 20px;
   }
   .site-header {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 18px 20px;
+    flex-wrap: nowrap;
+    gap: 8px;
+    padding: 18px 12px;
   }
   .site-header .actions {
-    gap: 6px;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    gap: 4px;
   }
   .site-header .btn {
-    padding-inline: 10px;
+    padding-inline: 8px;
     font-size: 10px;
+    white-space: nowrap;
   }
   .hero {
     min-height: 660px;

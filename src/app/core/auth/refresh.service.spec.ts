@@ -10,7 +10,7 @@ describe('Rotating refresh session', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: API_BASE_URL, useValue: 'http://localhost:3000/api' },
+        { provide: API_BASE_URL, useValue: '${environment.apiBaseUrl}' },
       ],
     }),
   );
@@ -21,7 +21,7 @@ describe('Rotating refresh session', () => {
       second = refresh.refresh();
     expect(first).toBe(second);
     const request = TestBed.inject(HttpTestingController).expectOne(
-      'http://localhost:3000/api/v1/auth/refresh',
+      '${environment.apiBaseUrl}/v1/auth/refresh',
     );
     expect(request.request.withCredentials).toBe(true);
     request.flush({ accessToken: 'new-token', expiresIn: 900 });
@@ -36,13 +36,13 @@ describe('Rotating refresh session', () => {
     const first = refresh.refresh();
     const failure = expect(first).rejects.toBeTruthy();
     TestBed.inject(HttpTestingController)
-      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .expectOne('${environment.apiBaseUrl}/v1/auth/refresh')
       .flush({}, { status: 401, statusText: 'Unauthorized' });
     await failure;
     expect(tokens.token()).toBeNull();
     const next = refresh.refresh();
     TestBed.inject(HttpTestingController)
-      .expectOne('http://localhost:3000/api/v1/auth/refresh')
+      .expectOne('${environment.apiBaseUrl}/v1/auth/refresh')
       .flush({ accessToken: 'recovered', expiresIn: 900 });
     expect(await next).toBe('recovered');
   });
@@ -54,7 +54,7 @@ describe('Rotating refresh session', () => {
       tokens.token.set('existing-access');
       const failed = expect(refresh.refresh()).rejects.toBeTruthy();
       const request = TestBed.inject(HttpTestingController).expectOne(
-        'http://localhost:3000/api/v1/auth/refresh',
+        '${environment.apiBaseUrl}/v1/auth/refresh',
       );
       request.flush({}, { status, statusText: 'Refresh unavailable' });
       await failed;

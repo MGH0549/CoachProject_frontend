@@ -116,13 +116,12 @@ main {
     inset-inline: 0;
     background: var(--surface);
     border-block-start: 1px solid var(--border);
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     padding: 6px 6px max(6px, env(safe-area-inset-bottom));
     z-index: 20;
   }
-  .mobile-nav a,
-  .mobile-nav button {
+  .mobile-nav a {
     display: grid;
     place-items: center;
     gap: 2px;
@@ -131,11 +130,11 @@ main {
     border: 0;
     color: var(--muted);
     font-size: 10px;
-    min-width: 60px;
+    min-width: 0;
     min-height: 48px;
   }
   .mobile-nav span {
-    font-size: 22px;
+    white-space: nowrap;
   }
   .mobile-nav .active {
     color: var(--red);
