@@ -6,6 +6,7 @@ import { MealCardComponent } from '../../../shared/meal-card/meal-card.component
 import { StatCardComponent } from '../../../shared/stat-card/stat-card.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MissingPlanComponent } from '../../../shared/missing-plan/missing-plan.component';
+import { SessionService } from '../../../core/auth/session.service';
 @Component({
   selector: 'app-diet',
   imports: [MealCardComponent, StatCardComponent, MissingPlanComponent],
@@ -13,6 +14,7 @@ import { MissingPlanComponent } from '../../../shared/missing-plan/missing-plan.
   styleUrl: './diet.component.css',
 })
 export class DietComponent {
+  private readonly session = inject(SessionService);
   private readonly api = inject(DietService);
   private readonly notices = inject(NotificationService);
   readonly plan = signal<Diet | null>(null);
@@ -23,6 +25,7 @@ export class DietComponent {
     void this.load();
   }
   async load() {
+    if (!this.session.isActive()) return;
     this.loading.set(true);
     this.error.set('');
     try {

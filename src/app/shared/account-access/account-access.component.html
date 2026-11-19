@@ -1,0 +1,39 @@
+<section
+  class="card access-notice"
+  aria-labelledby="account-access-title"
+  [attr.aria-busy]="busy()"
+>
+  @if (status(); as accountStatus) {
+    @if (accountStatus !== 'Active' && !session.accountUnavailable()) {
+      <app-status-badge [status]="accountStatus" />
+    }
+  }
+  <h2 id="account-access-title">
+    {{ 'accountAccess.' + title() | transloco: { name: session.account()?.fullName } }}
+  </h2>
+  <p>{{ 'accountAccess.' + body() | transloco }}</p>
+  @if (status() === 'Pending' && !planLocked() && !session.accountUnavailable()) {
+    <ol class="activation-steps">
+      @for (step of steps; track step; let index = $index) {
+        <li [class.done]="index === 0">
+          <span class="step-marker" aria-hidden="true">{{ index === 0 ? '✓' : '' }}</span>
+          {{ 'accountAccess.' + step | transloco }}
+        </li>
+      }
+    </ol>
+  }
+  <div class="notice-actions">
+    @if (session.whatsappUrl(); as whatsapp) {
+      <a class="btn full" [href]="whatsapp" target="_blank" rel="noopener noreferrer">
+        {{ 'accountAccess.whatsapp' | transloco }}
+      </a>
+    }
+    <button type="button" class="refresh-status" (click)="refresh()" [disabled]="busy()">
+      <app-icon name="refresh" />
+      {{ (busy() ? 'accountAccess.refreshing' : 'accountAccess.refresh') | transloco }}
+    </button>
+  </div>
+  @if (failed()) {
+    <p role="alert">{{ 'accountAccess.refreshError' | transloco }}</p>
+  }
+</section>

@@ -36,6 +36,7 @@ export class TrainingComponent {
     void this.load();
   }
   async load() {
+    if (!this.session.isActive()) return;
     this.loading.set(true);
     this.error.set('');
     try {

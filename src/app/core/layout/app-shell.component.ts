@@ -28,6 +28,7 @@ export class AppShellComponent {
   private readonly router = inject(Router);
   private readonly notices = inject(NotificationService);
   readonly clientLinks = [
+    { path: '/client/home', label: 'home', icon: '⌂' },
     { path: '/client/training', label: 'training', icon: '•' },
     { path: '/client/diet', label: 'diet', icon: '•' },
     { path: '/client/progress', label: 'progress', icon: '↗' },
@@ -41,6 +42,13 @@ export class AppShellComponent {
   ];
   get links() {
     return this.session.tokens.role() === 'Coach' ? this.coachLinks : this.clientLinks;
+  }
+  locked(label: string): boolean {
+    return (
+      this.session.tokens.role() === 'Client' &&
+      ['training', 'diet', 'progress'].includes(label) &&
+      !this.session.isActive()
+    );
   }
   async signOut() {
     const screen = this.outlet()?.component as {

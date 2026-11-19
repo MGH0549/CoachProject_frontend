@@ -5,6 +5,7 @@ import { provideRouter, Router } from '@angular/router';
 import { API_BASE_URL } from '../config/api-base-url.token';
 import { TokenStore } from './token-store.service';
 import { authInterceptor } from './auth.interceptor';
+import { SessionService } from './session.service';
 describe('Access token interceptor', () => {
   beforeEach(() =>
     TestBed.configureTestingModule({
@@ -35,6 +36,40 @@ describe('Access token interceptor', () => {
     expect(retried).toHaveLength(2);
     retried.forEach((r) => r.flush({ ok: true }));
     expect(values).toHaveLength(2);
+  });
+  it('rechecks inactive access even after a token refresh', async () => {
+    const http = TestBed.inject(HttpClient);
+    const testing = TestBed.inject(HttpTestingController);
+    const recover = vi
+      .spyOn(TestBed.inject(SessionService), 'recoverInactiveAccess')
+      .mockResolvedValue();
+    const failure = vi.fn();
+    http.get('${environment.apiBaseUrl}/v1/me/training').subscribe({ error: failure });
+    testing
+      .expectOne('${environment.apiBaseUrl}/v1/me/training')
+      .flush({}, { status: 401, statusText: 'Expired token' });
+    testing
+      .expectOne('${environment.apiBaseUrl}/v1/auth/refresh')
+      .flush({ accessToken: 'fresh', expiresIn: 900 });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    testing
+      .expectOne('${environment.apiBaseUrl}/v1/me/training')
+      .flush({ code: 'ACCESS_INACTIVE' }, { status: 403, statusText: 'Inactive' });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(recover).toHaveBeenCalledOnce();
+    expect(failure).toHaveBeenCalledOnce();
+  });
+  it('does not treat unrelated forbidden responses as inactive access', () => {
+    const recover = vi
+      .spyOn(TestBed.inject(SessionService), 'recoverInactiveAccess')
+      .mockResolvedValue();
+    TestBed.inject(HttpClient)
+      .get('${environment.apiBaseUrl}/v1/me/training')
+      .subscribe({ error: () => undefined });
+    TestBed.inject(HttpTestingController)
+      .expectOne('${environment.apiBaseUrl}/v1/me/training')
+      .flush({ code: 'FORBIDDEN' }, { status: 403, statusText: 'Forbidden' });
+    expect(recover).not.toHaveBeenCalled();
   });
   it('never adds tokens to an unrelated origin', () => {
     TestBed.inject(TokenStore).token.set('private-token');

@@ -122,6 +122,67 @@ describe('Session initialization and persistent-login recovery', () => {
     expect(await guarded).toBe(true);
   });
 
+  for (const status of ['Pending', 'Expired', 'Deactivated'] as const) {
+    it(`keeps ${status} clients signed in with plan access locked`, async () => {
+      succeed();
+      client.clientControllerAccount.mockReturnValue(of({ ...account, status }));
+      const session = TestBed.inject(SessionService);
+      await session.restore();
+      expect(session.state()).toBe('authenticated');
+      expect(session.isActive()).toBe(false);
+      expect(session.home()).toBe('/client/home');
+      expect(session.tokens.token()).toBe(token);
+    });
+  }
+
+  it('unlocks and locks pages reactively when /me changes status', async () => {
+    succeed();
+    const session = TestBed.inject(SessionService);
+    client.clientControllerAccount.mockReturnValue(of({ ...account, status: 'Pending' }));
+    await session.restore();
+    expect(session.isActive()).toBe(false);
+    client.clientControllerAccount.mockReturnValue(of(account));
+    await session.loadAccount();
+    expect(session.isActive()).toBe(true);
+    client.clientControllerAccount.mockReturnValue(of({ ...account, status: 'Expired' }));
+    await session.recoverInactiveAccess();
+    expect(session.account()?.status).toBe('Expired');
+    expect(session.isActive()).toBe(false);
+  });
+
+  it('deduplicates inactive recoveries and fails closed during a /me outage', async () => {
+    succeed();
+    const session = TestBed.inject(SessionService);
+    await session.restore();
+    client.clientControllerAccount.mockClear();
+    client.clientControllerAccount.mockReturnValue(
+      throwError(() => new HttpErrorResponse({ status: 503 })),
+    );
+    await Promise.all([session.recoverInactiveAccess(), session.recoverInactiveAccess()]);
+    expect(client.clientControllerAccount).toHaveBeenCalledOnce();
+    expect(session.isActive()).toBe(false);
+    expect(session.accountUnavailable()).toBe(true);
+    expect(session.tokens.token()).toBe(token);
+    client.clientControllerAccount.mockReturnValue(of(account));
+    await session.loadAccount();
+    expect(session.isActive()).toBe(true);
+    expect(session.accountUnavailable()).toBe(false);
+  });
+
+  it('allows only secure WhatsApp destinations from /me', () => {
+    const session = TestBed.inject(SessionService);
+    for (const whatsappUrl of [
+      'javascript:alert(1)',
+      'https://wa.me.evil.test/123',
+      'http://wa.me/123',
+    ]) {
+      session.account.set({ ...account, whatsappUrl });
+      expect(session.whatsappUrl()).toBeNull();
+    }
+    session.account.set({ ...account, whatsappUrl: 'https://wa.me/201234567890' });
+    expect(session.whatsappUrl()).toBe('https://wa.me/201234567890');
+  });
+
   it('redirects to login only after a definite rejected session', async () => {
     refresh.refresh.mockRejectedValue(new HttpErrorResponse({ status: 401 }));
     const guarded = await TestBed.runInInjectionContext(() =>

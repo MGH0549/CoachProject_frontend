@@ -1,4 +1,3 @@
-import { pendingGuard } from './core/auth/pending.guard';
 import { unsavedChangesGuard } from './core/routing/unsaved-changes.guard';
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
@@ -29,10 +28,8 @@ export const routes: Routes = [
   },
   {
     path: 'auth/pending',
-    canActivate: [authGuard, pendingGuard],
-    title: 'حالة الحساب',
-    loadComponent: () =>
-      import('./features/auth/pending/pending.component').then((m) => m.PendingComponent),
+    pathMatch: 'full',
+    redirectTo: 'client/home',
   },
   {
     path: 'auth',
@@ -77,27 +74,42 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./core/layout/app-shell.component').then((m) => m.AppShellComponent),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'training' },
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
+      {
+        path: 'home',
+        title: 'الرئيسية',
+        loadComponent: () =>
+          import('./features/client/home/home.component').then((m) => m.HomeComponent),
+      },
       {
         path: 'training',
         canActivate: [activeGuard],
         title: 'الخطة التدريبية',
+        data: { page: 'training' },
         loadComponent: () =>
-          import('./features/client/training/training.component').then((m) => m.TrainingComponent),
+          import('./features/client/plan-access/plan-access.component').then(
+            (m) => m.PlanAccessComponent,
+          ),
       },
       {
         path: 'diet',
         canActivate: [activeGuard],
         title: 'النظام الغذائي',
+        data: { page: 'diet' },
         loadComponent: () =>
-          import('./features/client/diet/diet.component').then((m) => m.DietComponent),
+          import('./features/client/plan-access/plan-access.component').then(
+            (m) => m.PlanAccessComponent,
+          ),
       },
       {
         path: 'progress',
         canActivate: [activeGuard],
         title: 'التقدم',
+        data: { page: 'progress' },
         loadComponent: () =>
-          import('./features/client/progress/progress.component').then((m) => m.ProgressComponent),
+          import('./features/client/plan-access/plan-access.component').then(
+            (m) => m.PlanAccessComponent,
+          ),
       },
       {
         path: 'profile',

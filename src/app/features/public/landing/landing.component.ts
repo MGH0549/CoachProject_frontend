@@ -1,12 +1,13 @@
 import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { SessionService } from '../../../core/auth/session.service';
 import { RouterLink } from '@angular/router';
 import { BrandComponent } from '../../../shared/brand/brand.component';
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, BrandComponent],
+  imports: [RouterLink, BrandComponent, DecimalPipe],
   templateUrl: './landing.component.html',
-  styleUrls: ['./landing.component.css', './results-carousel.css'],
+  styleUrls: ['./landing.component.css', './results-carousel.css', './training-preview.css'],
 })
 export class LandingComponent {
   readonly session = inject(SessionService);
@@ -78,11 +79,6 @@ export class LandingComponent {
   }
 
   readonly coachPhoto = 'images/landing/coach.jpg';
-  readonly galleryPhotos = [
-    { src: 'images/landing/motivation-1.jpg', alt: 'المدرب أثناء التمرين' },
-    { src: 'images/landing/motivation-2.jpg', alt: 'التركيز على الأداء أثناء التدريب' },
-    { src: 'images/landing/motivation-3.jpg', alt: 'الحماس والاستمرارية في التمرين' },
-  ];
   readonly unavailablePhotos = signal<ReadonlySet<string>>(new Set());
 
   onPhotoError(src: string): void {
@@ -95,29 +91,45 @@ export class LandingComponent {
     { title: 'أفعّل حسابك', text: 'بعد الاتفاق، أفتح لك لوحة التحكم وأبني خطتك.' },
     { title: 'تدرّب مع شرح بالفيديو', text: 'افتح خطتك، شاهد فيديو كل تمرين، واتبع نظامك الغذائي.' },
   ];
-  readonly packages = [
+  readonly discountPercent = 50;
+  readonly minimumSubscriptionMonths = 3;
+  readonly subscriptionDurations = [
+    { months: 3, label: '3 أشهر' },
+    { months: 6, label: '6 أشهر' },
+    { months: 12, label: '12 شهراً' },
+  ];
+  readonly selectedPackageMonths = signal<Record<string, number>>({});
+
+  selectPackageDuration(packageName: string, value: string): void {
+    const months = Number(value);
+    if (this.subscriptionDurations.some((duration) => duration.months === months)) {
+      this.selectedPackageMonths.update((selected) => ({ ...selected, [packageName]: months }));
+    }
+  }
+
+  readonly packages: {
+    name: string;
+    text: string;
+    popular: boolean;
+    price: number;
+    currency: string;
+    items: string[];
+  }[] = [
     {
       name: 'تدريب أونلاين',
       text: 'متابعة كاملة عن بُعد مع تسجيل أسبوعي للتقدم.',
       popular: false,
+      price: 3999,
+      currency: 'جنيه مصري',
       items: ['خطة تدريب شخصية', 'نظام غذائي بالماكروز', 'فيديو لكل تمرين', 'متابعة أسبوعية'],
     },
     {
       name: 'تدريب هجين',
       text: 'خطة أونلاين مع جلسات منتظمة معي في الجيم.',
       popular: true,
+      price: 3999,
+      currency: 'جنيه مصري',
       items: ['كل مزايا الأونلاين', 'جلسة شخصية شهرية', 'تصحيح الأداء مباشرة', 'أولوية دعم واتساب'],
-    },
-    {
-      name: 'تدريب شخصي 1:1',
-      text: 'نتدرب معاً خطوة بخطوة لتحقيق أفضل تقدم.',
-      popular: false,
-      items: [
-        'جلسات شخصية',
-        'خطة تدريب ونظام غذائي',
-        'توجيه الأداء والتكنيك',
-        'مراجعات مستمرة للتقدم',
-      ],
     },
   ];
   readonly results = [
@@ -143,6 +155,48 @@ export class LandingComponent {
       src: 'images/results/result-4.jpg',
       name: 'التحول الرابع',
       duration: '4 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-5.jpg',
+      name: 'التحول الخامس',
+      duration: '80 أسبوعاً',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-6.jpg',
+      name: 'التحول السادس',
+      duration: '4 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-7.jpg',
+      name: 'التحول السابع',
+      duration: '8 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-8.jpg',
+      name: 'التحول الثامن',
+      duration: '8 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-9.jpg',
+      name: 'التحول التاسع',
+      duration: '10 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-10.jpg',
+      name: 'التحول العاشر',
+      duration: '4 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-11.jpg',
+      name: 'التحول الحادى عشر',
+      duration: '8 أسابيع',
       alt: 'صور التحول الثالث قبل وبعد التدريب',
     },
   ];

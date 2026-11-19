@@ -22,7 +22,7 @@ test('registration leads to pending account and WhatsApp', async ({ page }) => {
   await page.getByLabel('كلمة المرور', { exact: true }).fill('StrongPass1234');
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'إنشاء حساب', exact: true }).click();
-  await expect(page).toHaveURL(/auth\/pending/);
+  await expect(page).toHaveURL(/client\/home/);
   await expect(page.locator('app-status-badge')).toContainText('بانتظار التفعيل');
   await expect(page.getByRole('link', { name: 'تواصل مع المدرب على واتساب' })).toHaveAttribute(
     'href',
@@ -149,14 +149,15 @@ for (const status of ['Pending', 'Expired', 'Deactivated'] as const)
   test(`${status} client cannot open active plans`, async ({ page }) => {
     await mockApi(page, 'Client', status);
     await page.goto('/client/training');
-    await expect(page).toHaveURL(/auth\/pending/);
+    await expect(page).toHaveURL(/client\/training/);
     await expect(page.locator('app-training')).toHaveCount(0);
+    await expect(page.locator('app-account-access')).toBeVisible();
   });
 
 test('client cannot enter coach routes', async ({ page }) => {
   await mockApi(page);
   await page.goto('/coach/clients');
-  await expect(page).toHaveURL(/client\/training/);
+  await expect(page).toHaveURL(/client\/home/);
 });
 
 test('new training template updates its saved ID on subsequent saves', async ({ page }) => {

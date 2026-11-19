@@ -1,0 +1,62 @@
+.home-heading {
+  margin-block-end: 24px;
+}
+h1 {
+  margin-block: 4px;
+}
+.home-heading p {
+  font-size: 13px;
+}
+.home-pages {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-block-start: 24px;
+}
+.home-page {
+  min-width: 0;
+  padding: 24px;
+}
+.home-page.locked {
+  border-style: dashed;
+}
+.page-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--raised);
+  color: var(--red);
+}
+.diet .page-icon {
+  color: var(--green-text);
+}
+h2 {
+  margin-block: 16px 8px;
+  font-size: 16px;
+}
+.home-page p {
+  font-size: 12px;
+  line-height: 1.9;
+}
+.page-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-block-start: 12px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: var(--raised);
+  color: var(--muted);
+  font-size: 10px;
+}
+.page-state app-icon {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 1000px) {
+  .home-pages {
+    grid-template-columns: 1fr;
+  }
+}

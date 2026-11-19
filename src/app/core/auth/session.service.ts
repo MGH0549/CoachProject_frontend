@@ -1,4 +1,4 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthenticationService } from '../api/services/authentication.service';
 import { ClientService } from '../api/services/client.service';
@@ -20,6 +20,24 @@ export class SessionService {
   private readonly diagnostics = inject(AuthDiagnostics);
   readonly tokens = inject(TokenStore);
   readonly account = signal<Account | null>(null);
+  readonly accountUnavailable = signal(false);
+  readonly accessBlocked = signal(false);
+  readonly isActive = computed(
+    () =>
+      this.account()?.status === 'Active' && !this.accountUnavailable() && !this.accessBlocked(),
+  );
+  readonly whatsappUrl = computed(() => {
+    try {
+      const url = new URL(this.account()?.whatsappUrl ?? '');
+      return url.protocol === 'https:' && ['wa.me', 'api.whatsapp.com'].includes(url.hostname)
+        ? url.href
+        : null;
+    } catch {
+      return null;
+    }
+  });
+  private accountRequest: Promise<void> | null = null;
+  private inactiveRecovery: Promise<void> | null = null;
   readonly state = signal<SessionState>('checking');
   readonly restorationError = signal('');
   private restored: Promise<void> | null = null;
@@ -74,6 +92,8 @@ export class SessionService {
   private markSignedOut(): void {
     this.tokens.token.set(null);
     this.account.set(null);
+    this.accountUnavailable.set(false);
+    this.accessBlocked.set(false);
     this.state.set('unauthenticated');
     this.resolveReady();
   }
@@ -89,9 +109,31 @@ export class SessionService {
     this.resolveReady();
     this.restored = Promise.resolve();
   }
-  async loadAccount(): Promise<void> {
-    if (this.tokens.role() === 'Client')
-      this.account.set(await firstValueFrom(this.client.clientControllerAccount()));
+  loadAccount(): Promise<void> {
+    if (this.tokens.role() !== 'Client') return Promise.resolve();
+    if (this.accountRequest) return this.accountRequest;
+    this.accountRequest = firstValueFrom(this.client.clientControllerAccount())
+      .then((account) => {
+        this.account.set(account);
+        this.accountUnavailable.set(false);
+        // A 403 recovery stays blocked until an explicit successful status refresh.
+        if (!this.inactiveRecovery) this.accessBlocked.set(false);
+      })
+      .catch((error) => {
+        this.accountUnavailable.set(true);
+        throw error;
+      })
+      .finally(() => (this.accountRequest = null));
+    return this.accountRequest;
+  }
+  recoverInactiveAccess(): Promise<void> {
+    this.accessBlocked.set(true);
+    if (!this.inactiveRecovery) {
+      this.inactiveRecovery = this.loadAccount()
+        .catch(() => undefined)
+        .finally(() => (this.inactiveRecovery = null));
+    }
+    return this.inactiveRecovery;
   }
   async signOut(): Promise<void> {
     this.diagnostics.log('logout_triggered', { reason: 'user_requested' });
@@ -103,6 +145,6 @@ export class SessionService {
   }
   home(): string {
     if (this.tokens.role() === 'Coach') return '/coach/clients';
-    return this.account()?.status === 'Active' ? '/client/training' : '/auth/pending';
+    return '/client/home';
   }
 }

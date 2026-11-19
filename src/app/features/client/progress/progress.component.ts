@@ -6,6 +6,7 @@ import { NotificationService } from '../../../core/feedback/notification.service
 import { StatCardComponent } from '../../../shared/stat-card/stat-card.component';
 import { ProgressChartComponent } from '../../../shared/progress-chart/progress-chart.component';
 import { CairoDatePipe } from '../../../shared/pipes/cairo-date.pipe';
+import { SessionService } from '../../../core/auth/session.service';
 @Component({
   selector: 'app-progress',
   imports: [StatCardComponent, ProgressChartComponent, CairoDatePipe],
@@ -13,6 +14,7 @@ import { CairoDatePipe } from '../../../shared/pipes/cairo-date.pipe';
   styleUrl: './progress.component.css',
 })
 export class ProgressComponent implements OnDestroy {
+  private readonly session = inject(SessionService);
   private photoTimer?: ReturnType<typeof setTimeout>;
   ngOnDestroy() {
     clearTimeout(this.photoTimer);
@@ -39,6 +41,7 @@ export class ProgressComponent implements OnDestroy {
     void this.load();
   }
   async load(page = 1) {
+    if (!this.session.isActive()) return;
     this.loading.set(true);
     this.error.set('');
     this.photos.set([]);

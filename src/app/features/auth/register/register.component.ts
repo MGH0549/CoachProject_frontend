@@ -46,7 +46,7 @@ export class RegisterComponent {
       await this.auth.register({ ...data, consent: true });
       this.registered.set(true);
       await this.session.signIn({ email: data.email, password: data.password });
-      await this.router.navigateByUrl('/auth/pending');
+      await this.router.navigateByUrl('/client/home');
     } catch (error) {
       this.error.set(
         this.registered() ? 'تم إنشاء الحساب. سجّل الدخول للمتابعة.' : this.notices.error(error),

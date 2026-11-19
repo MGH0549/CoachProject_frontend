@@ -1,0 +1,69 @@
+:host {
+  display: block;
+}
+.access-notice {
+  padding: clamp(20px, 3vw, 28px);
+  border-color: var(--amber-text);
+  border-radius: 20px;
+}
+h2 {
+  margin-block: 14px 12px;
+  font-size: 22px;
+}
+p {
+  line-height: 1.9;
+  font-size: 13px;
+}
+.activation-steps {
+  list-style: none;
+  margin-block: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--raised);
+  display: grid;
+  gap: 12px;
+}
+.activation-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.activation-steps .done {
+  color: var(--text);
+}
+.step-marker {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+}
+.done .step-marker {
+  background: var(--action-red);
+  border-color: var(--action-red);
+  color: var(--on-action);
+}
+.notice-actions {
+  display: grid;
+  gap: 8px;
+  margin-block-start: 20px;
+}
+.refresh-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+}
+[role='alert'] {
+  color: var(--danger-text);
+}

@@ -77,6 +77,10 @@ export async function mockApi(
     }
     if (path === '/auth/register') {
       state.registered = true;
+      const body = request.postDataJSON();
+      state.account.fullName = body.fullName;
+      state.account.email = body.email;
+      state.account.whatsapp = body.whatsapp;
       state.account.status = 'Pending';
       return send({ id: account.id, status: 'Pending', whatsappUrl: account.whatsappUrl }, 201);
     }

@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
+import { isInactiveAccess } from '../auth/inactive-access';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
@@ -13,6 +14,8 @@ export class NotificationService {
     this.timer = setTimeout(() => this.message.set(''), 7000);
   }
   error(error: unknown): string {
+    // The account boundary explains inactive access; it is not a plan failure.
+    if (isInactiveAccess(error)) return '';
     const messages: Record<string, string> = {
       INVALID_CREDENTIALS: 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
       EMAIL_EXISTS: 'هذا البريد مسجل بالفعل. يمكنك تسجيل الدخول.',

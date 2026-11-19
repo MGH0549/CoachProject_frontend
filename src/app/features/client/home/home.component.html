@@ -1,0 +1,48 @@
+<header class="home-heading">
+  <span class="eyebrow">{{ 'accountAccess.welcome' | transloco }}</span>
+  <h1>
+    {{
+      'accountAccess.hello'
+        | transloco
+          : { name: session.account()?.fullName || translations.translate('accountAccess.member') }
+    }}
+  </h1>
+  <p>
+    {{
+      (session.isActive()
+        ? 'accountAccess.activeIntro'
+        : session.account()?.status === 'Pending'
+          ? 'accountAccess.pendingIntro'
+          : 'accountAccess.inactiveIntro'
+      ) | transloco
+    }}
+  </p>
+</header>
+@if (!session.isActive()) {
+  <app-account-access />
+}
+<div class="home-pages" [attr.aria-busy]="loading()">
+  @for (page of pages; track page) {
+    <a
+      class="card home-page"
+      [class.locked]="!session.isActive()"
+      [class.diet]="page === 'diet'"
+      [routerLink]="'/client/' + page"
+    >
+      <span class="page-icon"><app-icon [name]="page" /></span>
+      <h2>{{ 'accountAccess.' + page + 'Title' | transloco }}</h2>
+      <p>
+        {{ 'accountAccess.' + page + (session.isActive() ? 'ActiveBody' : 'Body') | transloco }}
+      </p>
+      <span class="page-state">
+        @if (!session.isActive()) {
+          <app-icon name="lock" />
+        }
+        {{
+          (session.isActive() ? 'accountAccess.openPage' : 'accountAccess.opensAfterActivation')
+            | transloco
+        }}
+      </span>
+    </a>
+  }
+</div>

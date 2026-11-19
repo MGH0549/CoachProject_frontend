@@ -12,7 +12,7 @@ for (const role of ['Client', 'Coach'] as const) {
     await page.goto(role === 'Coach' ? '/coach/clients' : '/client/training');
     const nav = page.locator('.mobile-nav');
     await expect(nav).toBeVisible();
-    await expect(nav.locator('a')).toHaveCount(4);
+    await expect(nav.locator('a')).toHaveCount(role === 'Client' ? 5 : 4);
     await expect(nav.locator('button')).toHaveCount(0);
     const links = await nav.locator('a').evaluateAll((items) =>
       items.map((item) => {

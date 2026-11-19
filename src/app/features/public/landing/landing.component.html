@@ -62,52 +62,29 @@
         }
       </div>
     </section>
-    <!-- <section class="motivation-section" aria-labelledby="motivation-title">
-      <span class="eyebrow">كل يوم أقوى</span>
-      <h2 id="motivation-title">الشغف بالتمرين. والإصرار على التقدم.</h2>
-      <div class="motivation-gallery">
-        @for (photo of galleryPhotos; track photo.src) {
-          <div class="motivation-photo">
-            @if (!unavailablePhotos().has(photo.src)) {
-              <img
-                [src]="photo.src"
-                [alt]="photo.alt"
-                width="1000"
-                height="800"
-                loading="lazy"
-                decoding="async"
-                (error)="onPhotoError(photo.src)"
-              />
-            } @else {
-              <span>{{ photo.alt }}</span>
-            }
-          </div>
-        }
+    <section
+      id="training-preview"
+      class="training-preview"
+      aria-labelledby="training-preview-title"
+    >
+      <span class="eyebrow">شوف التدريب بنفسك</span>
+      <h2 id="training-preview-title">خطوة بخطوة في كل تمرين</h2>
+      <p class="training-preview-intro">
+        خُد فكرة عن تجربة التدريب: شرح للحركة، توجيه للأداء، ومتابعة تساعدك تتمرّن بثقة.
+      </p>
+      <div class="training-video-frame">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/rT7DgCr-3pg?rel=0&playsinline=1&autoplay=1&mute=1"
+          title="فيديو توضيحي لتجربة التدريب مع المدرب"
+          width="900"
+          height="506"
+          loading="lazy"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+          allowfullscreen
+        ></iframe>
       </div>
-    </section> -->
-    <section id="coaching">
-      <span class="eyebrow">التدريب</span>
-      <h2>اختر الطريقة المناسبة لك</h2>
-      <div class="three-columns packages">
-        @for (package of packages; track package.name) {
-          <article class="card package" [class.popular]="package.popular">
-            @if (package.popular) {
-              <span class="popular-label">الأكثر اختياراً</span>
-            }
-            <h3>{{ package.name }}</h3>
-            <p>{{ package.text }}</p>
-            <span class="price">السعر: اسأل على واتساب</span>
-            <ul class="check-list">
-              @for (item of package.items; track item) {
-                <li>{{ item }}</li>
-              }
-            </ul>
-            <a class="btn full" [class.secondary]="!package.popular" routerLink="/auth/register"
-              >تواصل مع المدرب</a
-            >
-          </article>
-        }
-      </div>
+   
     </section>
     <section
       id="results"
@@ -205,10 +182,73 @@
           [attr.aria-live]="autoplayPaused() ? 'polite' : 'off'"
           aria-atomic="true"
         >
-          {{ activeResult() + 1 }} / {{ results.length }} · {{ results[activeResult()].name }}
+          {{ activeResult() + 1 }} /{{ results.length-1 }}+ · {{ results[activeResult()].name }}
         </p>
       </div>
     </section>
+    <section id="coaching">
+      <span class="eyebrow">التدريب</span>
+      <h2>اختر الطريقة المناسبة لك</h2>
+      <div class="three-columns packages">
+        @for (package of packages; track package.name) {
+          @let selectedMonths = selectedPackageMonths()[package.name] ?? minimumSubscriptionMonths;
+          <article class="card package" [class.popular]="package.popular">
+            @if (package.popular) {
+              <span class="popular-label">الأكثر اختياراً</span>
+            }
+            <h3>{{ package.name }}</h3>
+            <p>{{ package.text }}</p>
+            <div class="package-pricing">
+              <label class="duration-selector">
+                <span>مدة الاشتراك</span>
+                <select
+                  #durationSelect
+                  [value]="selectedMonths"
+                  (change)="selectPackageDuration(package.name, durationSelect.value)"
+                >
+                  @for (duration of subscriptionDurations; track duration.months) {
+                    <option [value]="duration.months">{{ duration.label }}</option>
+                  }
+                </select>
+              </label>
+              <span class="discount-label">خصم {{ discountPercent }}%</span>
+              <div class="duration-price" aria-live="polite" aria-atomic="true">
+                <span class="subscription-total">السعر الإجمالي لمدة {{ selectedMonths }} شهر</span>
+                <span class="original-price">
+                  قبل الخصم:
+                  <s>
+                    {{
+                      package.price * (selectedMonths / minimumSubscriptionMonths) | number: '1.0-2'
+                    }}
+                    {{ package.currency }}
+                  </s>
+                </span>
+                <span class="price">
+                  {{
+                    package.price *
+                      (selectedMonths / minimumSubscriptionMonths) *
+                      (1 - discountPercent / 100) | number: '1.0-2'
+                  }}
+                  <small>{{ package.currency }} بعد الخصم</small>
+                </span>
+              </div>
+              <span class="subscription-minimum">
+                الحد الأدنى للاشتراك {{ minimumSubscriptionMonths }} أشهر
+              </span>
+            </div>
+            <ul class="check-list">
+              @for (item of package.items; track item) {
+                <li>{{ item }}</li>
+              }
+            </ul>
+            <a class="btn full" [class.secondary]="!package.popular" routerLink="/auth/register"
+              >تواصل مع المدرب</a
+            >
+          </article>
+        }
+      </div>
+    </section>
+
     <section id="contact" class="cta">
       <h2>مستعد للبدء؟</h2>
       <p>أنشئ حسابك، تواصل معي على واتساب، ولنبدأ بناء خطتك.</p>

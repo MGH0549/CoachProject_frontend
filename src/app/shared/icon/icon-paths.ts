@@ -1,4 +1,7 @@
 export const iconPaths: Record<string, string[]> = {
+  home: ['M3 10 12 3l9 7v11h-6v-7H9v7H3z'],
+  lock: ['M6 10h12v11H6zM8 10V7a4 4 0 0 1 8 0v3M12 14v3'],
+  refresh: ['M20 7v5h-5M4 17v-5h5M5 8a8 8 0 0 1 13-3l2 2M4 17l2 2a8 8 0 0 0 13-3'],
   training: ['M2 12h4l3-8 4 16 3-8h6'],
   diet: ['M5 3v7m-3-7v5c0 3 6 3 6 0V3M5 11v10M16 3v18M16 3c-5 2-5 9 0 9'],
   progress: ['M4 3v17h17M7 15l4-5 4 2 5-7'],

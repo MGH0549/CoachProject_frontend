@@ -1,5 +1,6 @@
 .results-carousel {
-  max-width: 800px;
+  width: 100%;
+  max-width: 640px;
   margin: 32px auto 0;
 }
 .results-viewport {
@@ -16,6 +17,16 @@
   min-width: 0;
   padding: 16px;
 }
+.result-slide .result-photo {
+  height: clamp(200px, 48vw, 380px);
+  aspect-ratio: auto;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+.result-slide .result-photo img {
+  max-width: 100%;
+  max-height: 100%;
+}
 .results-controls,
 .results-dots {
   display: flex;
@@ -23,9 +34,14 @@
   justify-content: center;
 }
 .results-controls {
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
   gap: 8px;
-  margin-block-start: 20px;
+  margin-block-start: 16px;
+}
+.results-dots {
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .carousel-arrow,
 .carousel-play,
@@ -41,6 +57,8 @@
   font-size: 22px;
 }
 .carousel-play {
+  grid-column: 1 / -1;
+  justify-self: center;
   border-radius: 22px;
   padding-inline: 16px;
 }

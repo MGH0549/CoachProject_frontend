@@ -1,0 +1,30 @@
+.training-preview {
+  text-align: center;
+}
+.training-preview-intro {
+  max-width: 580px;
+  margin: 12px auto 28px;
+  font-size: 14px;
+  line-height: 1.9;
+}
+.training-video-frame {
+  width: min(100%, 900px);
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+}
+.training-video-frame iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  background: #0a0a0a;
+}
+.training-video-link {
+  display: inline-block;
+  margin-block-start: 16px;
+  font-size: 13px;
+}

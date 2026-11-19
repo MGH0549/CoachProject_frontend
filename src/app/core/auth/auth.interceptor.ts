@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { Injector, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, from, switchMap, throwError } from 'rxjs';
 import { API_BASE_URL } from '../config/api-base-url.token';
@@ -7,6 +7,8 @@ import { RefreshService } from './refresh.service';
 import { AuthDiagnostics } from './auth-diagnostics.service';
 import { sessionRejected } from './session-rejected';
 import { TokenStore } from './token-store.service';
+import { SessionService } from './session.service';
+import { isInactiveAccess } from './inactive-access';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const base = inject(API_BASE_URL).replace(/\/$/, '');
@@ -14,6 +16,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const refresh = inject(RefreshService);
   const router = inject(Router);
   const diagnostics = inject(AuthDiagnostics);
+  const injector = inject(Injector);
   if (!request.url.startsWith(`${base}/v1/`) || request.url.startsWith(`${base}/v1/auth/`))
     return next(request);
   const token = tokens.token();
@@ -40,6 +43,17 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
           next(request.clone({ setHeaders: { Authorization: `Bearer ${accessToken}` } })),
         ),
       );
+    }),
+    catchError((error: unknown) => {
+      if (!isInactiveAccess(error)) return throwError(() => error);
+      const session = injector.get(SessionService);
+      // Do not recursively retry /me if the account endpoint itself rejects access.
+      if (request.url.split('?')[0] === `${base}/v1/me`) {
+        session.accessBlocked.set(true);
+        session.accountUnavailable.set(true);
+        return throwError(() => error);
+      }
+      return from(session.recoverInactiveAccess()).pipe(switchMap(() => throwError(() => error)));
     }),
   );
 };
