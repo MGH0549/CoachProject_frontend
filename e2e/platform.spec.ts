@@ -39,15 +39,23 @@ test('training loads alternatives, records the chosen version, and keeps video l
   await page.goto('/client/training');
   await expect(page.getByRole('heading', { name: 'يوم الدفع', exact: true })).toBeVisible();
   await expect(page.locator('iframe')).toHaveCount(0);
+  await page.locator('.exercise-row').click();
   await page.getByRole('button', { name: 'ضغط الصدر بالدمبل', exact: true }).click();
   await expect(page.locator('app-video-panel button')).toHaveAttribute(
     'aria-label',
     'تشغيل ضغط الصدر بالدمبل',
   );
-  await page.getByRole('button', { name: 'تسجيل إتمام التمرين', exact: true }).click();
-  await expect(
-    page.getByRole('button', { name: '✓ تم تسجيل التمرين', exact: true }),
-  ).toBeDisabled();
+  for (let number = 1; number <= 4; number++) {
+    await page
+      .getByRole('spinbutton', { name: `وزن المجموعة ${number} بالكيلوجرام`, exact: true })
+      .fill('20');
+    await page
+      .getByRole('spinbutton', { name: `تكرارات المجموعة ${number}`, exact: true })
+      .fill('8');
+  }
+  await page.getByRole('button', { name: 'حفظ الأوزان وإتمام التمرين', exact: true }).click();
+  await expect(page.locator('.exercise-row .last-weight')).toContainText('20');
+  await expect(page.locator('.exercise-row')).toContainText('✓');
   await page.screenshot({ path: testInfo.outputPath('training.png'), fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
@@ -92,12 +100,27 @@ test('weekly check-in saves and renders new measurements', async ({ page }) => {
   await page.getByRole('button', { name: 'تسجيل المتابعة', exact: true }).first().click();
   await page.getByLabel('الوزن (كجم)', { exact: true }).fill('83.5');
   await page.getByLabel('الخصر (سم)', { exact: true }).fill('81');
+  await page.getByLabel('عرض الكتفين (سم)', { exact: true }).fill('46.5');
   await page.getByRole('button', { name: 'إرسال إلى المدرب', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'المتابعة الأسبوعية', exact: true })).toHaveCount(
     0,
   );
   await expect(page.locator('app-stat-card').first().locator('strong')).toHaveText('83.5');
   expect(state.history).toHaveLength(2);
+  expect(state.history[0].measurements['shoulderWidth']).toBe(46.5);
+  await expect(
+    page.locator('app-stat-card').filter({ hasText: 'عرض الكتفين' }).locator('strong'),
+  ).toHaveText('46.5');
+  await page.getByRole('button', { name: 'عرض الكتفين', exact: true }).click();
+  await expect(page.locator('app-progress-chart [role="img"]')).toHaveAttribute(
+    'aria-label',
+    'عرض الكتفين بالسنتيمتر: 46.5',
+  );
+  await expect(page.locator('tbody tr').first()).toContainText('46.5');
+  await page.reload();
+  await expect(
+    page.locator('app-stat-card').filter({ hasText: 'عرض الكتفين' }).locator('strong'),
+  ).toHaveText('46.5');
 });
 
 test('coach activates pending client', async ({ page }) => {
@@ -191,8 +214,11 @@ test('coach diet builder saves targets and locks choices', async ({ page }, test
 
 test('coach feedback is saved on the selected check-in', async ({ page }) => {
   const state = await mockApi(page, 'Coach');
+  state.history[0].measurements['shoulderWidth'] = 46.5;
   await page.goto('/coach/clients/client-1');
   await page.getByRole('button', { name: 'التقدم والملاحظات', exact: true }).click();
+  await expect(page.locator('app-client-progress')).toContainText('عرض الكتفين');
+  await expect(page.locator('app-client-progress')).toContainText('46.5');
   await page.getByLabel('ملاحظات المدرب', { exact: true }).fill('أحسنت، استمر على الخطة.');
   await page.getByRole('button', { name: 'حفظ الملاحظات', exact: true }).click();
   await expect.poll(() => state.history[0].feedback).toBe('أحسنت، استمر على الخطة.');
@@ -228,6 +254,7 @@ test('photo retry does not duplicate an already saved check-in', async ({ page }
     0,
   );
   expect(state.checkInSubmissions).toBe(1);
+  expect(state.history[0].measurements).not.toHaveProperty('shoulderWidth');
   expect(attempts).toBe(2);
 });
 

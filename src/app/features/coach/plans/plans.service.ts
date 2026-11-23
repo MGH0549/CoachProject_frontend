@@ -4,8 +4,26 @@ import { CoachService } from '../../../core/api/services/coach.service';
 import { TemplatesService } from '../../../core/api/services/templates.service';
 import { TrainingDto } from '../../../core/api/models/training-dto';
 import { DietDto } from '../../../core/api/models/diet-dto';
+import { HttpClient } from '@angular/common/http';
+import { API_BASE_URL } from '../../../core/config/api-base-url.token';
 @Injectable({ providedIn: 'root' })
 export class PlansService {
+  private readonly http = inject(HttpClient);
+  private readonly base = inject(API_BASE_URL);
+  deleteTemplate(kind: 'training' | 'diet', id: string, version: number) {
+    return firstValueFrom(
+      this.http.delete(`${this.base}/v1/coach/templates/${kind}/${encodeURIComponent(id)}`, {
+        body: { version },
+      }),
+    );
+  }
+  deletePlan(clientId: string, kind: 'training' | 'diet', planId: string, version: number) {
+    return firstValueFrom(
+      this.http.delete(`${this.base}/v1/coach/clients/${encodeURIComponent(clientId)}/${kind}`, {
+        body: { planId, version },
+      }),
+    );
+  }
   private readonly coach = inject(CoachService);
   private readonly templates = inject(TemplatesService);
   training(clientId: string, templateId = '') {

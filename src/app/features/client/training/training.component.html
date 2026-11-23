@@ -20,6 +20,7 @@
         role="tab"
         [attr.aria-selected]="dayIndex() === index"
         [class.active]="dayIndex() === index"
+        [disabled]="busy()"
         (click)="selectDay(index)"
       >
         {{ day.name }}
@@ -33,17 +34,34 @@
           <button
             class="exercise-row"
             [class.selected]="selected()?.id === placement.id"
-            (click)="selectedId.set(placement.id)"
+            [disabled]="busy()"
+            (click)="selectExercise(placement.id)"
           >
             <span class="video-thumb" aria-hidden="true"><span>▶</span></span
             ><span class="exercise-label"
               ><strong
-                ><bdi>{{ placement.exercise.name }}</bdi></strong
-              ><small>{{ placement.exercise.muscleGroup }}</small></span
+                ><bdi>{{ rowSource(placement).exercise.name }}</bdi></strong
+              ><small>{{ rowSource(placement).exercise.muscleGroup }}</small></span
             ><span class="reps"
-              ><bdi>{{ placement.sets }} × {{ placement.reps }}</bdi
-              ><small>راحة {{ placement.restSeconds }} ث</small></span
-            ><span aria-hidden="true">{{ completed().includes(placement.id) ? '✓' : '‹' }}</span>
+              ><bdi
+                >{{ rowSource(placement).sets ?? placement.sets }} ×
+                {{ rowSource(placement).reps ?? placement.reps }}</bdi
+              ><small>راحة {{ placement.restSeconds }} ث</small>
+              <small class="last-weight">
+                @if (lastSet(placement); as last) {
+                  {{ 'trainingWeights.last' | transloco }}
+                  <bdi dir="ltr"
+                    >{{ last.weightKg }} {{ 'kg' }} ×
+                    {{ last.repetitions }}</bdi
+                  >
+                } @else {
+                  {{ 'trainingWeights.empty' | transloco }}
+                }
+              </small>
+              @if (bests().includes(key(placement))) {
+                <small class="new-best">{{ 'strength.newBest' | transloco }}</small>
+              }</span
+            ><span aria-hidden="true">{{ completed().includes(key(placement)) ? '✓' : '‹' }}</span>
           </button>
           @if (selected()?.id === placement.id && placement.alternatives.length) {
             <div class="alternatives">
@@ -78,9 +96,34 @@
       }
     </div>
     @if (exercise(); as exercise) {
-      <aside class="card video-card">
+      @if (mobile()?.matches && panelOpen()) {
+        <div
+          class="sheet-backdrop"
+          aria-hidden="true"
+          (click)="!busy() && panelOpen.set(false)"
+        ></div>
+      }
+      <aside
+        class="card video-card"
+        tabindex="-1"
+        [class.panel-open]="panelOpen()"
+        [attr.role]="mobile()?.matches ? 'dialog' : null"
+        [attr.aria-modal]="mobile()?.matches && panelOpen() ? true : null"
+        aria-labelledby="selected-exercise-title"
+        [cdkTrapFocus]="!!mobile()?.matches && panelOpen()"
+        [cdkTrapFocusAutoCapture]="!!mobile()?.matches && panelOpen()"
+        (keydown.escape)="!busy() && panelOpen.set(false)"
+      >
+        <button
+          class="close-sheet"
+          type="button"
+          [disabled]="busy()"
+          (click)="panelOpen.set(false)"
+        >
+          {{ 'trainingWeights.close' | transloco }}
+        </button>
         <app-video-panel [videoId]="exercise.youtubeVideoId" [title]="exercise.name" />
-        <h2>
+        <h2 id="selected-exercise-title">
           <bdi>{{ exercise.name }}</bdi>
         </h2>
         <span class="muscle">{{ exercise.muscleGroup }}</span>
@@ -90,19 +133,35 @@
             <p>{{ alternative()?.note || selected()?.note || exercise.notes }}</p>
           </div>
         }
-        <button
-          class="btn full"
-          [disabled]="busy() || completed().includes(selected()!.id)"
-          (click)="log()"
-        >
-          {{
-            completed().includes(selected()!.id)
-              ? '✓ تم تسجيل التمرين'
-              : busy()
-                ? 'جارٍ الحفظ…'
-                : 'تسجيل إتمام التمرين'
-          }}
-        </button>
+        @if (mobile()?.matches && selected(); as placement) {
+          <div class="pills mobile-choices">
+            <button
+              class="pill"
+              [disabled]="busy() || plan.choicesLocked || placement.choicesLocked"
+              [class.active]="!placement.selectedAlternativeId"
+              (click)="choose(placement, null)"
+            >
+              التمرين الأساسي
+            </button>
+            @for (alt of placement.alternatives; track alt.id) {
+              <button
+                class="pill"
+                [disabled]="busy() || plan.choicesLocked || placement.choicesLocked"
+                [class.active]="placement.selectedAlternativeId === alt.id"
+                (click)="choose(placement, alt.id)"
+              >
+                <bdi>{{ alt.exercise.name }}</bdi>
+              </button>
+            }
+          </div>
+        }
+        @if (selected(); as placement) {
+          <app-training-weights
+            [placement]="placement"
+            (saved)="onSaved($event)"
+            (working)="busy.set($event)"
+          />
+        }
       </aside>
     }
   </div>

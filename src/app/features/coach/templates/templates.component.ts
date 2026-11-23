@@ -6,15 +6,46 @@ import { TemplatePage } from '../../../core/api/models/template-page';
 import { TemplateSummary } from '../../../core/api/models/template-summary';
 import { ClientPage } from '../../../core/api/models/client-page';
 import { NotificationService } from '../../../core/feedback/notification.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 @Component({
   selector: 'app-templates',
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, TranslocoPipe],
   templateUrl: './templates.component.html',
   styleUrl: './templates.component.css',
 })
 export class TemplatesComponent {
   private readonly api = inject(TemplatesService);
   private readonly notices = inject(NotificationService);
+  private readonly translations = inject(TranslocoService);
+  async remove(template: TemplateSummary) {
+    if (this.busy() || this.loading()) return;
+    if (!confirm(this.translations.translate('planActions.confirmTemplate'))) return;
+    this.busy.set(true);
+    try {
+      await this.api.remove(this.diet(), template.id, template.version);
+      if (this.selected()?.id === template.id) this.selected.set(null);
+      const current = this.data();
+      this.data.update((data) =>
+        data
+          ? {
+              ...data,
+              total: data.total - 1,
+              items: data.items.filter((item) => item.id !== template.id),
+            }
+          : data,
+      );
+      const page = Math.min(
+        current?.page ?? 1,
+        Math.max(1, Math.ceil(((current?.total ?? 1) - 1) / (current?.pageSize ?? 20))),
+      );
+      await this.load(page);
+      this.notices.show(this.translations.translate('planActions.templateDeleted'));
+    } catch (error) {
+      this.notices.error(error);
+    } finally {
+      this.busy.set(false);
+    }
+  }
   readonly diet = signal(false);
   readonly data = signal<TemplatePage | null>(null);
   readonly clients = signal<ClientPage | null>(null);

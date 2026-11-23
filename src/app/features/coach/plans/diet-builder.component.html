@@ -7,6 +7,18 @@
         placeholder="اسم النظام الغذائي"
     /></label>
     <div class="actions">
+      @if (original()) {
+        <button
+          class="text-button"
+          type="button"
+          [disabled]="busy() || loading()"
+          (click)="deletePlan()"
+        >
+          {{
+            (templateMode() ? 'planActions.deleteTemplate' : 'planActions.deleteDiet') | transloco
+          }}
+        </button>
+      }
       <button class="btn secondary" [disabled]="busy() || loading()" (click)="reload()">
         إعادة تحميل
       </button>

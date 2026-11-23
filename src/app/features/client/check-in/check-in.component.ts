@@ -3,9 +3,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DialogRef } from '@angular/cdk/dialog';
 import { ProgressService } from '../progress/progress.service';
 import { NotificationService } from '../../../core/feedback/notification.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-check-in',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, TranslocoPipe],
   templateUrl: './check-in.component.html',
   styleUrl: './check-in.component.css',
 })
@@ -19,6 +20,7 @@ export class CheckInComponent implements OnDestroy {
     waist: [0, [Validators.min(0), Validators.max(400)]],
     chest: [0, [Validators.min(0), Validators.max(400)]],
     arms: [0, [Validators.min(0), Validators.max(150)]],
+    shoulderWidth: this.fb.control<number | null>(null, [Validators.min(0), Validators.max(1000)]),
     energy: [3, [Validators.required, Validators.min(1), Validators.max(5)]],
     notes: ['', [Validators.maxLength(3000)]],
   });
@@ -62,6 +64,7 @@ export class CheckInComponent implements OnDestroy {
         if (data.waist) measurements['waist'] = data.waist;
         if (data.chest) measurements['chest'] = data.chest;
         if (data.arms) measurements['arms'] = data.arms;
+        if (data.shoulderWidth !== null) measurements['shoulderWidth'] = data.shoulderWidth;
         const result = await this.api.submit({
           weight: data.weight,
           energy: data.energy,

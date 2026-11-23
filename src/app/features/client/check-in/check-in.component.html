@@ -13,6 +13,23 @@
         >الذراع (سم)<input type="number" step="0.1" formControlName="arms"
       /></label>
     </div>
+    <label class="field" for="check-in-shoulder-width">{{
+      'progressMeasurements.shoulderLabel' | transloco
+    }}</label>
+    <input
+      id="check-in-shoulder-width"
+      type="number"
+      inputmode="decimal"
+      dir="ltr"
+      step="0.1"
+      min="0"
+      max="1000"
+      formControlName="shoulderWidth"
+      aria-describedby="shoulder-width-help"
+    />
+    <p id="shoulder-width-help" class="caption muted">
+      {{ 'progressMeasurements.shoulderHelp' | transloco }}
+    </p>
     <div>
       <p class="field">صور التقدم <small>اختيارية · حتى 8 ميجابايت للصورة</small></p>
       <div class="photo-slots">

@@ -7,14 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-import { Workout } from '../../models/workout';
+import { TrainingCompletion } from '../../models/training-completion';
 import { WorkoutDto } from '../../models/workout-dto';
 
 export interface ClientControllerLog$Params {
       body: WorkoutDto
 }
 
-export function clientControllerLog(http: HttpClient, rootUrl: string, params: ClientControllerLog$Params, context?: HttpContext): Observable<StrictHttpResponse<Workout>> {
+export function clientControllerLog(http: HttpClient, rootUrl: string, params: ClientControllerLog$Params, context?: HttpContext): Observable<StrictHttpResponse<TrainingCompletion>> {
   const rb = new RequestBuilder(rootUrl, clientControllerLog.PATH, 'post');
   if (params) {
     rb.body(params.body, 'application/json');
@@ -25,7 +25,7 @@ export function clientControllerLog(http: HttpClient, rootUrl: string, params: C
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return r as StrictHttpResponse<Workout>;
+      return r as StrictHttpResponse<TrainingCompletion>;
     })
   );
 }

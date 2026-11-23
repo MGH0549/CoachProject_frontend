@@ -9,9 +9,11 @@ import { Training } from '../../../core/api/models/training';
 import { Exercise } from '../../../core/api/models/exercise';
 import { PlacementDto } from '../../../core/api/models/placement-dto';
 import { NotificationService } from '../../../core/feedback/notification.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-training-builder',
-  imports: [FormsModule, DragDropModule],
+  imports: [FormsModule, DragDropModule, TranslocoPipe],
   templateUrl: './training-builder.component.html',
   styleUrl: './training-builder.component.css',
 })
@@ -22,6 +24,45 @@ export class TrainingBuilderComponent {
   private readonly api = inject(PlansService);
   private readonly libraryApi = inject(LibraryService);
   private readonly notices = inject(NotificationService);
+  private readonly translations = inject(TranslocoService);
+  private readonly router = inject(Router);
+  async deletePlan() {
+    const plan = this.original();
+    if (!plan || this.busy() || this.loading()) return;
+    const template = this.templateMode();
+    if (
+      !confirm(
+        this.translations.translate(
+          template ? 'planActions.confirmTemplate' : 'planActions.confirmTraining',
+        ),
+      )
+    )
+      return;
+    this.busy.set(true);
+    try {
+      if (template) await this.api.deleteTemplate('training', plan.id, plan.version);
+      else await this.api.deletePlan(this.clientId(), 'training', plan.id, plan.version);
+      this.original.set(null);
+      this.draft.set({ name: '', days: [] });
+      this.dirty.set(false);
+      this.error.set('');
+      this.dayIndex.set(0);
+      this.exerciseIndex.set(0);
+      this.notices.show(
+        this.translations.translate(
+          template ? 'planActions.templateDeleted' : 'planActions.trainingDeleted',
+        ),
+      );
+      if (template) {
+        this.currentTemplateId.set('');
+        await this.router.navigateByUrl('/coach/templates');
+      }
+    } catch (error) {
+      this.notices.error(error);
+    } finally {
+      this.busy.set(false);
+    }
+  }
   readonly draft = signal<TrainingDto>({ name: '', days: [] });
   readonly original = signal<Training | null>(null);
   readonly currentTemplateId = signal('');

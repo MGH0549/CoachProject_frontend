@@ -19,6 +19,15 @@
 }
 .stack {
   align-content: start;
+  min-inline-size: 0;
+}
+.stack > .card {
+  min-inline-size: 0;
+}
+.measurement-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
 }
 .card h3 {
   margin-block-end: 12px;

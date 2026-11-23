@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ClientService } from '../../../core/api/services/client.service';
+import { StrengthSet } from '../strength/strength.models';
 @Injectable({ providedIn: 'root' })
 export class TrainingService {
   private readonly api = inject(ClientService);
@@ -13,9 +14,11 @@ export class TrainingService {
     );
     return this.load();
   }
-  log(planExerciseId: string, alternativeId: string | null) {
+  log(planExerciseId: string, alternativeId: string | null, sets?: StrengthSet[]) {
     return firstValueFrom(
-      this.api.clientControllerLog({ body: { planExerciseId, alternativeId } }),
+      this.api.clientControllerLog({
+        body: { planExerciseId, alternativeId, ...(sets ? { sets } : {}) },
+      }),
     );
   }
 }

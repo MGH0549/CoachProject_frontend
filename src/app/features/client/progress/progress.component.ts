@@ -7,9 +7,17 @@ import { StatCardComponent } from '../../../shared/stat-card/stat-card.component
 import { ProgressChartComponent } from '../../../shared/progress-chart/progress-chart.component';
 import { CairoDatePipe } from '../../../shared/pipes/cairo-date.pipe';
 import { SessionService } from '../../../core/auth/session.service';
+import { StrengthComponent } from '../strength/strength.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-progress',
-  imports: [StatCardComponent, ProgressChartComponent, CairoDatePipe],
+  imports: [
+    StatCardComponent,
+    ProgressChartComponent,
+    CairoDatePipe,
+    StrengthComponent,
+    TranslocoPipe,
+  ],
   templateUrl: './progress.component.html',
   styleUrl: './progress.component.css',
 })
@@ -28,6 +36,13 @@ export class ProgressComponent implements OnDestroy {
   readonly loading = signal(true);
   readonly error = signal('');
   readonly metric = signal('weight');
+  readonly bodyMetrics = [
+    { key: 'weight', label: 'progressMeasurements.weight' },
+    { key: 'waist', label: 'progressMeasurements.waist' },
+    { key: 'chest', label: 'progressMeasurements.chest' },
+    { key: 'shoulderWidth', label: 'progressMeasurements.shoulderWidth' },
+  ];
+  readonly tab = signal<'body' | 'strength'>('body');
   readonly photos = signal<{ id: string; url: string }[]>([]);
   readonly photoBusy = signal(false);
   readonly latest = computed(() => this.data()?.items[0]);
@@ -39,6 +54,25 @@ export class ProgressComponent implements OnDestroy {
   );
   constructor() {
     void this.load();
+  }
+  selectTab(tab: 'body' | 'strength') {
+    if (tab === this.tab()) return;
+    this.tab.set(tab);
+    if (tab === 'body') void this.load();
+  }
+  tabKey(event: KeyboardEvent) {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const tab =
+      event.key === 'Home'
+        ? 'body'
+        : event.key === 'End'
+          ? 'strength'
+          : this.tab() === 'body'
+            ? 'strength'
+            : 'body';
+    this.selectTab(tab);
+    document.getElementById(`${tab}-tab`)?.focus();
   }
   async load(page = 1) {
     if (!this.session.isActive()) return;

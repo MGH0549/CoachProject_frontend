@@ -7,6 +7,10 @@ export const accountTranslations = {
     Deactivated: 'غير مفعل',
   },
   accountAccess: {
+    intakeTitle: 'أكمل بياناتك قبل بدء التدريب',
+    intakeBody: 'املأ الاستمارة بالتفاصيل الإضافية التي يحتاجها مدربك لتجهيز خطتك المناسبة لك.',
+    intakeButton: 'ملء استمارة بيانات العميل',
+    intakeNewTab: 'تفتح الاستمارة في علامة تبويب جديدة.',
     welcome: 'أهلاً بك في الفريق',
     hello: 'أهلاً {{name}}',
     pendingIntro: 'حسابك جاهز. تبقّت خطوة تفعيله بواسطة مدربك.',

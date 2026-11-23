@@ -47,7 +47,7 @@ import { PhotoId } from '../models/photo-id';
 import { PhotoLink } from '../models/photo-link';
 import { ProgressPage } from '../models/progress-page';
 import { Training } from '../models/training';
-import { Workout } from '../models/workout';
+import { TrainingCompletion } from '../models/training-completion';
 import { WorkoutPage } from '../models/workout-page';
 
 @Injectable({ providedIn: 'root' })
@@ -60,6 +60,8 @@ export class ClientService extends BaseService {
   static readonly ClientControllerAccountPath = '/api/v1/me';
 
   /**
+   * Available to authenticated clients including Pending, Expired and Deactivated. Returns only the seven account fields; no internal database fields.
+   *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `clientControllerAccount()` instead.
    *
@@ -71,6 +73,8 @@ export class ClientService extends BaseService {
   }
 
   /**
+   * Available to authenticated clients including Pending, Expired and Deactivated. Returns only the seven account fields; no internal database fields.
+   *
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `clientControllerAccount$Response()` instead.
    *
@@ -114,6 +118,8 @@ export class ClientService extends BaseService {
   static readonly ClientControllerPlanPath = '/api/v1/me/training';
 
   /**
+   * Own plan only. Each placement and alternative independently includes lastSession (sets, recordedAt, Cairo localDate) and bestWeightKg for its actual exercise. Both fields are omitted when never logged. Completion without sets does not change lastSession.
+   *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `clientControllerPlan()` instead.
    *
@@ -125,6 +131,8 @@ export class ClientService extends BaseService {
   }
 
   /**
+   * Own plan only. Each placement and alternative independently includes lastSession (sets, recordedAt, Cairo localDate) and bestWeightKg for its actual exercise. Both fields are omitted when never logged. Completion without sets does not change lastSession.
+   *
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `clientControllerPlan$Response()` instead.
    *
@@ -249,26 +257,30 @@ export class ClientService extends BaseService {
   static readonly ClientControllerLogPath = '/api/v1/me/workouts';
 
   /**
+   * Save completion and optional sets in one atomic workout insert. Omit sets for completion only. Supplied sets must contain 1-10 rows: weight 0-500 kg in 0.25 increments, integer reps 1-100. Daily cap is 10 sets per actual exercise in Africa/Cairo. Active clients only; plan ownership, alternatives and choice locks are enforced.
+   *
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `clientControllerLog()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  clientControllerLog$Response(params: ClientControllerLog$Params, context?: HttpContext): Observable<StrictHttpResponse<Workout>> {
+  clientControllerLog$Response(params: ClientControllerLog$Params, context?: HttpContext): Observable<StrictHttpResponse<TrainingCompletion>> {
     const obs = clientControllerLog(this.http, this.rootUrl, params, context);
     return obs;
   }
 
   /**
+   * Save completion and optional sets in one atomic workout insert. Omit sets for completion only. Supplied sets must contain 1-10 rows: weight 0-500 kg in 0.25 increments, integer reps 1-100. Daily cap is 10 sets per actual exercise in Africa/Cairo. Active clients only; plan ownership, alternatives and choice locks are enforced.
+   *
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `clientControllerLog$Response()` instead.
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  clientControllerLog(params: ClientControllerLog$Params, context?: HttpContext): Observable<Workout> {
+  clientControllerLog(params: ClientControllerLog$Params, context?: HttpContext): Observable<TrainingCompletion> {
     const resp = this.clientControllerLog$Response(params, context);
     return resp.pipe(
-      map((r: StrictHttpResponse<Workout>): Workout => r.body)
+      map((r: StrictHttpResponse<TrainingCompletion>): TrainingCompletion => r.body)
     );
   }
 

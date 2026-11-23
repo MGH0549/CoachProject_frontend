@@ -18,6 +18,25 @@
     }}
   </p>
 </header>
+@if (session.account()?.status === 'Pending') {
+  <section class="card intake-card" aria-labelledby="intake-title">
+    <div>
+      <h2 id="intake-title">{{ 'accountAccess.intakeTitle' | transloco }}</h2>
+      <p>{{ 'accountAccess.intakeBody' | transloco }}</p>
+    </div>
+    <div class="intake-action">
+      <a
+        class="btn"
+        href="https://docs.google.com/forms/d/e/1FAIpQLSf74ZalTdcoEN_FnGWcGY7-SV3V18Lo5xFmS5s15ygOgb3oGg/viewform?usp=header"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-describedby="intake-new-tab"
+        >{{ 'accountAccess.intakeButton' | transloco }}</a
+      >
+      <small id="intake-new-tab">{{ 'accountAccess.intakeNewTab' | transloco }}</small>
+    </div>
+  </section>
+}
 @if (!session.isActive()) {
   <app-account-access />
 }

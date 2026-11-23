@@ -3,12 +3,15 @@
 
 import { Alternative } from '../models/alternative';
 import { Exercise } from '../models/exercise';
+import { LastTrainingSession } from '../models/last-training-session';
 export interface Placement {
   alternatives: Array<Alternative>;
+  bestWeightKg?: number;
   choicesLocked: boolean;
   exercise: Exercise;
   exerciseId: string;
   id: string;
+  lastSession?: LastTrainingSession;
   note?: string;
   order: number;
   reps: string;

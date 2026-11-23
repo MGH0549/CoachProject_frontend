@@ -6,6 +6,18 @@
       placeholder="اسم الخطة التدريبية"
   /></label>
   <div class="actions">
+    @if (original()) {
+      <button
+        class="text-button"
+        type="button"
+        [disabled]="busy() || loading()"
+        (click)="deletePlan()"
+      >
+        {{
+          (templateMode() ? 'planActions.deleteTemplate' : 'planActions.deleteTraining') | transloco
+        }}
+      </button>
+    }
     <button class="btn secondary" [disabled]="busy() || loading()" (click)="reload()">
       إعادة تحميل
     </button>
@@ -110,13 +122,14 @@
                   type="number"
                   min="0"
                   [(ngModel)]="item.restSeconds"
-                  (ngModelChange)="change()" /></label
-              ><label class="field"
+                  (ngModelChange)="change()"
+              /></label>
+              <!-- <label class="field"
                 >الإيقاع<input
                   [(ngModel)]="item.tempo"
                   (ngModelChange)="change()"
                   placeholder="2-0-1"
-              /></label>
+              /></label> -->
             </div>
             <label class="field"
               >ملاحظة للعميل<textarea [(ngModel)]="item.note" (ngModelChange)="change()"></textarea>

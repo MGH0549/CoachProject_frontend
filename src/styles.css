@@ -298,6 +298,13 @@ tbody tr:last-child td {
 .cdk-overlay-backdrop {
   background: #000b;
 }
+@media (max-width: 760px) {
+  .weight-sheet-pane {
+    align-self: flex-end;
+    margin: 0 !important;
+    width: 100vw;
+  }
+}
 .link {
   text-decoration: underline;
   text-underline-offset: 4px;

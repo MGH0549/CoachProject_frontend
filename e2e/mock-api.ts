@@ -4,6 +4,7 @@ import { TrainingDto } from '../src/app/core/api/models/training-dto';
 import { Training } from '../src/app/core/api/models/training';
 import { Page } from '@playwright/test';
 import { account, training, diet, exercise, checkIn } from './fixtures';
+import { StrengthSession } from '../src/app/features/client/strength/strength.models';
 export async function mockApi(
   page: Page,
   role: 'Client' | 'Coach' | null = 'Client',
@@ -14,11 +15,24 @@ export async function mockApi(
     training: structuredClone(training),
     diet: structuredClone(diet),
     history: [structuredClone(checkIn)],
+    strength: [] as StrengthSession[],
     role,
     registered: false,
     copied: false,
     templateCreates: 0,
     trainingSaves: 0,
+    trainingDeleted: false,
+    dietDeleted: false,
+    trainingTemplates: [
+      structuredClone({
+        ...training,
+        id: 'template-1',
+        name: 'دفع سحب أرجل',
+        isTemplate: true,
+        clientId: null,
+      }),
+    ] as Training[],
+    dietTemplates: [] as Diet[],
     mealChoices: 0,
     dietSaves: 0,
     checkInSubmissions: 0,
@@ -91,14 +105,125 @@ export async function mockApi(
     )
       return send({ message: 'ok' });
     if (path === '/me') return send(state.account);
-    if (path === '/me/training') return send(state.training);
+    if (path.startsWith('/me/strength') && state.account.status !== 'Active')
+      return send({ code: 'ACCESS_INACTIVE' }, 403);
+    if (path === '/me/strength/overview') {
+      const exercises = state.training.days.flatMap((day) =>
+        day.exercises.flatMap((placement) => [
+          placement.exercise,
+          ...placement.alternatives.map((alt) => alt.exercise),
+        ]),
+      );
+      const unique = new Map(exercises.map((e) => [e.id, e.name]));
+      for (const session of state.strength) unique.set(session.exerciseId, session.exerciseName);
+      return send({
+        items: [...unique].map(([exerciseId, exerciseName]) => {
+          const sessions = state.strength
+            .filter((s) => s.exerciseId === exerciseId)
+            .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt));
+          const sets = sessions.flatMap((s) => s.sets);
+          return {
+            exerciseId,
+            exerciseName,
+            latestWeightKg: sessions[0]?.heaviestWeightKg ?? null,
+            bestWeightKg: sets.length ? Math.max(...sets.map((s) => s.weightKg)) : null,
+            bestSet: sets[0] ?? null,
+            estimatedOneRepMaxKg: null,
+            trendKg: null,
+            latestRecordedAt: sessions[0]?.recordedAt ?? null,
+          };
+        }),
+      });
+    }
+    if (path.startsWith('/me/strength/exercises/')) {
+      const exerciseId = path.split('/').at(-1);
+      const url = new URL(request.url());
+      const page = Number(url.searchParams.get('page') || 1),
+        pageSize = Number(url.searchParams.get('pageSize') || 20);
+      const items = state.strength
+        .filter((s) => s.exerciseId === exerciseId)
+        .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt));
+      return send({
+        items: items.slice((page - 1) * pageSize, page * pageSize),
+        total: items.length,
+        page,
+        pageSize,
+      });
+    }
+    if (
+      (path === '/me/strength' && method === 'POST') ||
+      (path === '/me/workouts' && method === 'POST' && request.postDataJSON().sets) ||
+      (path.startsWith('/me/strength/') && method === 'PUT')
+    ) {
+      const body = request.postDataJSON();
+      const old = state.strength.find((s) => s.id === path.split('/').at(-1));
+      const placement = state.training.days
+        .flatMap((d) => d.exercises)
+        .find((p) => p.id === body.planExerciseId);
+      const chosen =
+        placement?.alternatives.find((a) => a.id === body.alternativeId)?.exercise ??
+        placement?.exercise;
+      const result: StrengthSession = {
+        ...old,
+        id: old?.id ?? `strength-${Date.now()}`,
+        exerciseId: old?.exerciseId ?? chosen!.id,
+        exerciseName: old?.exerciseName ?? chosen!.name,
+        planExerciseId: old?.planExerciseId ?? body.planExerciseId,
+        alternativeId: old?.alternativeId ?? body.alternativeId,
+        recordedAt: old?.recordedAt ?? new Date().toISOString(),
+        localDate:
+          old?.localDate ?? new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }),
+        sets: body.sets,
+        note: body.note ?? null,
+        bestSet: body.sets[0],
+        heaviestWeightKg: Math.max(...body.sets.map((s: { weightKg: number }) => s.weightKg)),
+        estimatedOneRepMaxKg: null,
+      };
+      state.strength = [...state.strength.filter((s) => s.id !== result.id), result];
+      return send(result, old ? 200 : 201);
+    }
+    if (path.startsWith('/me/strength/') && method === 'DELETE') {
+      state.strength = state.strength.filter((s) => s.id !== path.split('/').at(-1));
+      return send({ message: 'ok' });
+    }
+    if (path === '/me/training') {
+      const last = (exerciseId: string) => {
+        const history = state.strength
+          .filter((s) => s.exerciseId === exerciseId)
+          .sort((a, b) => b.recordedAt.localeCompare(a.recordedAt));
+        const latest = history[0];
+        return latest
+          ? {
+              lastSession: {
+                sets: latest.sets,
+                recordedAt: latest.recordedAt,
+                localDate: latest.localDate,
+              },
+              bestWeightKg: Math.max(...history.flatMap((s) => s.sets.map((set) => set.weightKg))),
+            }
+          : {};
+      };
+      const plan = {
+        ...state.training,
+        days: state.training.days.map((day) => ({
+          ...day,
+          exercises: day.exercises.map((p) => ({
+            ...p,
+            ...last(p.exerciseId),
+            alternatives: p.alternatives.map((a) => ({ ...a, ...last(a.exerciseId) })),
+          })),
+        })),
+      };
+      return state.trainingDeleted ? send({ code: 'NOT_FOUND' }, 404) : send(plan);
+    }
     if (path.includes('/training/exercises/') && method === 'PUT') {
       state.training.version++;
       state.training.days[0].exercises[0].selectedAlternativeId =
         request.postDataJSON().alternativeId;
       return send(state.training);
     }
-    if (path === '/me/diet') return send(state.diet);
+    if (path === '/me/diet')
+      return state.dietDeleted ? send({ code: 'NOT_FOUND' }, 404) : send(state.diet);
     if (path.includes('/diet/meals/') && method === 'PUT') {
       state.mealChoices++;
       if (state.conflict) {
@@ -119,7 +244,16 @@ export async function mockApi(
     }
     if (path === '/me/progress') return send(paged(state.history));
     if (path === '/me/workouts')
-      return method === 'GET' ? send(paged([])) : send({ id: 'workout-1' });
+      return method === 'GET'
+        ? send(paged([]))
+        : send(
+            {
+              id: 'workout-1',
+              recordedAt: new Date().toISOString(),
+              localDate: new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Cairo' }),
+            },
+            201,
+          );
     if (path === '/me/check-ins') {
       state.checkInSubmissions++;
       const item = { ...checkIn, ...request.postDataJSON(), id: 'check-new' };
@@ -138,13 +272,29 @@ export async function mockApi(
       return send(state.account);
     }
     if (path === '/coach/clients/client-1/training') {
+      if (method === 'DELETE') {
+        const body = request.postDataJSON();
+        if (body.planId !== state.training.id || body.version !== state.training.version)
+          return send({ code: 'VERSION_CONFLICT' }, 409);
+        state.trainingDeleted = true;
+        return send({ message: 'ok' });
+      }
       if (method === 'PUT') {
         state.trainingSaves++;
         state.training = enrichTraining(request.postDataJSON());
+        state.trainingDeleted = false;
       }
+      if (state.trainingDeleted) return send({ code: 'NOT_FOUND' }, 404);
       return send(state.training);
     }
     if (path === '/coach/clients/client-1/diet') {
+      if (method === 'DELETE') {
+        const body = request.postDataJSON();
+        if (body.planId !== state.diet.id || body.version !== state.diet.version)
+          return send({ code: 'VERSION_CONFLICT' }, 409);
+        state.dietDeleted = true;
+        return send({ message: 'ok' });
+      }
       if (method === 'PUT') {
         state.dietSaves++;
         const body: DietDto = request.postDataJSON();
@@ -161,7 +311,9 @@ export async function mockApi(
           })),
         };
         state.diet = plan;
+        state.dietDeleted = false;
       }
+      if (state.dietDeleted) return send({ code: 'NOT_FOUND' }, 404);
       return send(state.diet);
     }
     if (path === '/coach/clients/client-1/diet/lock') {
@@ -185,20 +337,62 @@ export async function mockApi(
     if (path === '/coach/templates/training') {
       if (method === 'POST') {
         state.templateCreates++;
-        return send({
-          ...state.training,
-          ...request.postDataJSON(),
-          id: 'new-template',
+        const template = {
+          ...enrichTraining(request.postDataJSON(), 'new-template'),
           version: 1,
           isTemplate: true,
-        });
+          clientId: null,
+        };
+        state.trainingTemplates.push(template);
+        return send(template);
       }
-      return send(paged([{ id: 'template-1', name: 'دفع سحب أرجل', version: 1 }]));
+      return send(
+        paged(state.trainingTemplates.map(({ id, name, version }) => ({ id, name, version }))),
+      );
     }
-    if (path === '/coach/templates/diet') return send(paged([]));
-    if (path === '/coach/templates/training/new-template') {
-      state.trainingSaves++;
-      return send({ ...enrichTraining(request.postDataJSON(), 'new-template'), isTemplate: true });
+    if (path === '/coach/templates/diet') {
+      if (method === 'POST') {
+        const template = {
+          ...state.diet,
+          ...request.postDataJSON(),
+          id: 'new-diet-template',
+          version: 1,
+          isTemplate: true,
+          clientId: null,
+        };
+        state.dietTemplates.push(template);
+        return send(template);
+      }
+      return send(
+        paged(state.dietTemplates.map(({ id, name, version }) => ({ id, name, version }))),
+      );
+    }
+    const templatePath = path.match(/^\/coach\/templates\/(training|diet)\/([^/]+)$/);
+    if (templatePath) {
+      const kind = templatePath[1],
+        id = templatePath[2];
+      const templates = kind === 'training' ? state.trainingTemplates : state.dietTemplates;
+      const index = templates.findIndex((template) => template.id === id);
+      if (index < 0) return send({ code: 'NOT_FOUND' }, 404);
+      if (method === 'DELETE') {
+        if (request.postDataJSON().version !== templates[index].version)
+          return send({ code: 'VERSION_CONFLICT' }, 409);
+        templates.splice(index, 1);
+        return send({ message: 'ok' });
+      }
+      if (method === 'PUT') {
+        const old = templates[index];
+        if (kind === 'training') {
+          state.trainingSaves++;
+          templates[index] = {
+            ...enrichTraining(request.postDataJSON(), id),
+            version: old.version + 1,
+            isTemplate: true,
+            clientId: null,
+          };
+        } else templates[index] = { ...old, ...request.postDataJSON(), version: old.version + 1 };
+      }
+      return send(templates[index]);
     }
     if (path.endsWith('/copy')) {
       state.copied = true;

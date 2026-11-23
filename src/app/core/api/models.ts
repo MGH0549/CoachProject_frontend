@@ -54,3 +54,7 @@ export type { VersionDto } from './models/version-dto';
 export type { Workout } from './models/workout';
 export type { WorkoutDto } from './models/workout-dto';
 export type { WorkoutPage } from './models/workout-page';
+export type { LastTrainingSession } from './models/last-training-session';
+export type { StrengthSession } from './models/strength-session';
+export type { StrengthSet } from './models/strength-set';
+export type { TrainingCompletion } from './models/training-completion';

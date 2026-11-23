@@ -6,9 +6,11 @@ import { DietDto } from '../../../core/api/models/diet-dto';
 import { Diet } from '../../../core/api/models/diet';
 import { OptionDto } from '../../../core/api/models/option-dto';
 import { NotificationService } from '../../../core/feedback/notification.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-diet-builder',
-  imports: [FormsModule],
+  imports: [FormsModule, TranslocoPipe],
   templateUrl: './diet-builder.component.html',
   styleUrl: './diet-builder.component.css',
 })
@@ -18,6 +20,44 @@ export class DietBuilderComponent {
   readonly templateId = input('');
   private readonly api = inject(PlansService);
   private readonly notices = inject(NotificationService);
+  private readonly translations = inject(TranslocoService);
+  private readonly router = inject(Router);
+  async deletePlan() {
+    const plan = this.original();
+    if (!plan || this.busy() || this.loading()) return;
+    const template = this.templateMode();
+    if (
+      !confirm(
+        this.translations.translate(
+          template ? 'planActions.confirmTemplate' : 'planActions.confirmDiet',
+        ),
+      )
+    )
+      return;
+    this.busy.set(true);
+    try {
+      if (template) await this.api.deleteTemplate('diet', plan.id, plan.version);
+      else await this.api.deletePlan(this.clientId(), 'diet', plan.id, plan.version);
+      this.original.set(null);
+      this.draft.set({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0, meals: [] });
+      this.dirty.set(false);
+      this.error.set('');
+      this.mealIndex.set(0);
+      this.notices.show(
+        this.translations.translate(
+          template ? 'planActions.templateDeleted' : 'planActions.dietDeleted',
+        ),
+      );
+      if (template) {
+        this.currentTemplateId.set('');
+        await this.router.navigateByUrl('/coach/templates');
+      }
+    } catch (error) {
+      this.notices.error(error);
+    } finally {
+      this.busy.set(false);
+    }
+  }
   readonly draft = signal<DietDto>({
     name: '',
     calories: 0,

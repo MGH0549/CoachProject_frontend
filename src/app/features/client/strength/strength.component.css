@@ -1,0 +1,264 @@
+.strength-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-block: 20px;
+  flex-wrap: wrap;
+}
+.strength-toolbar label {
+  font-size: 12px;
+  color: var(--muted);
+}
+.strength-toolbar select {
+  width: min(100%, 300px);
+}
+.log-weights {
+  margin-inline-start: auto;
+}
+.strength-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.strength-summary article {
+  padding: 18px;
+  min-width: 0;
+}
+.strength-summary span,
+.strength-summary small {
+  font-size: 11px;
+  color: var(--muted);
+}
+.strength-summary strong {
+  display: block;
+  font-size: 26px;
+  margin-block: 4px;
+}
+.strength-summary p {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.strength-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.45fr);
+  gap: 18px;
+  margin-block-start: 18px;
+  align-items: start;
+}
+.strength-main {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.chart-card,
+.sessions-card,
+.lifts-card {
+  padding: 20px;
+  min-width: 0;
+}
+h2 {
+  font-size: 15px;
+}
+h3 {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+.chart-heading,
+.range-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.range-row {
+  margin-block: 14px;
+}
+.range-row small {
+  font-size: 10px;
+}
+.new-best {
+  background: var(--danger-surface);
+  color: var(--red-text);
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 16px;
+}
+.range-buttons {
+  display: flex;
+  gap: 4px;
+}
+.range-buttons button {
+  min-height: 44px;
+  min-width: 44px;
+  border: 0;
+  border-radius: 22px;
+  padding: 6px 10px;
+  background: var(--raised);
+  color: var(--muted);
+  font-size: 10px;
+}
+.range-buttons .active {
+  background: var(--action-red);
+  color: var(--on-action);
+}
+.strength-chart {
+  direction: ltr;
+}
+.strength-chart svg {
+  width: 100%;
+  display: block;
+}
+.chart-grid {
+  stroke: var(--border);
+  fill: none;
+}
+.chart-area {
+  fill: var(--red);
+  fill-opacity: 0.12;
+}
+.chart-line {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+circle {
+  fill: var(--red);
+}
+.chart-dates {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.session-row {
+  padding-block: 12px;
+  border-block-start: 1px solid var(--border);
+}
+.session-details {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+.session-sets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+}
+.session-best {
+  color: var(--red-text);
+}
+.session-note {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  margin-block-start: 8px;
+}
+.session-actions {
+  display: flex;
+  gap: 10px;
+}
+.session-actions .text-button {
+  font-size: 11px;
+}
+.lifts-card > p {
+  font-size: 11px;
+  margin-block: 8px 12px;
+}
+.lift-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px;
+  width: 100%;
+  text-align: start;
+  margin-block-start: 8px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  font-size: 11px;
+}
+.lift-row span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.lift-row small {
+  display: block;
+  font-size: 9px;
+  margin-block-start: 4px;
+}
+.lift-row.selected {
+  border-color: var(--red);
+  background: var(--raised);
+}
+.positive {
+  color: var(--green-text);
+}
+.negative {
+  color: var(--danger-text);
+}
+.delete-confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-block: 8px;
+}
+.delete-confirm p {
+  flex-basis: 100%;
+}
+.empty-strength {
+  text-align: center;
+  padding: 28px;
+  margin-block-start: 18px;
+}
+.empty-strength p,
+.form-hint {
+  font-size: 12px;
+  line-height: 1.9;
+  margin-block-start: 10px;
+}
+@media (max-width: 1100px) {
+  .strength-layout {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .strength-toolbar select {
+    width: 100%;
+  }
+  .log-weights {
+    position: fixed;
+    inset-block-end: calc(82px + env(safe-area-inset-bottom));
+    inset-inline: 16px;
+    z-index: 15;
+  }
+  :host {
+    display: block;
+    padding-block-end: 65px;
+  }
+  .strength-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .strength-summary article:last-child {
+    grid-column: 1 / -1;
+  }
+  .strength-summary strong {
+    font-size: 23px;
+  }
+  .chart-card,
+  .sessions-card,
+  .lifts-card {
+    padding: 14px;
+  }
+}

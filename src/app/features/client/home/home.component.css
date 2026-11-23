@@ -7,6 +7,36 @@ h1 {
 .home-heading p {
   font-size: 13px;
 }
+.intake-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 24px;
+  margin-block-end: 24px;
+  border-color: var(--red);
+}
+.intake-card h2 {
+  margin-block: 0 8px;
+}
+.intake-card p {
+  max-width: 540px;
+  font-size: 12px;
+  line-height: 1.9;
+}
+.intake-action {
+  display: grid;
+  gap: 8px;
+}
+.intake-action small {
+  font-size: 10px;
+}
+@media (max-width: 640px) {
+  .intake-action {
+    width: 100%;
+  }
+}
 .home-pages {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

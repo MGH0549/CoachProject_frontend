@@ -4,8 +4,13 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { TemplatesService as GeneratedTemplatesService } from '../../../core/api/services/templates.service';
 import { CoachService } from '../../../core/api/services/coach.service';
+import { PlansService } from '../plans/plans.service';
 @Injectable({ providedIn: 'root' })
 export class TemplatesService {
+  private readonly plans = inject(PlansService);
+  remove(diet: boolean, id: string, version: number) {
+    return this.plans.deleteTemplate(diet ? 'diet' : 'training', id, version);
+  }
   private readonly api = inject(GeneratedTemplatesService);
   private readonly coach = inject(CoachService);
   list(diet: boolean, page = 1, search = '') {

@@ -6,9 +6,10 @@ import { CheckIn } from '../../../core/api/models/check-in';
 import { NotificationService } from '../../../core/feedback/notification.service';
 import { CairoDatePipe } from '../../../shared/pipes/cairo-date.pipe';
 import { ProgressChartComponent } from '../../../shared/progress-chart/progress-chart.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 @Component({
   selector: 'app-client-progress',
-  imports: [FormsModule, CairoDatePipe, ProgressChartComponent],
+  imports: [FormsModule, CairoDatePipe, ProgressChartComponent, TranslocoPipe],
   templateUrl: './client-progress.component.html',
   styleUrl: './client-progress.component.css',
 })

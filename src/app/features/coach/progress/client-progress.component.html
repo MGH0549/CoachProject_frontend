@@ -19,7 +19,10 @@
         </header>
         <p class="caption">
           الطاقة: {{ item.energy }} / 5 · الخصر: {{ item.measurements['waist'] ?? '—' }} سم · الصدر:
-          {{ item.measurements['chest'] ?? '—' }} سم
+          {{ item.measurements['chest'] ?? '—' }} سم ·
+          {{ 'progressMeasurements.shoulderWidth' | transloco }}:
+          <bdi>{{ item.measurements['shoulderWidth'] ?? '—' }}</bdi>
+          {{ 'progressMeasurements.cm' | transloco }}
         </p>
         <p>{{ item.notes || 'بدون ملاحظات' }}</p>
         @if (item.photos.length) {

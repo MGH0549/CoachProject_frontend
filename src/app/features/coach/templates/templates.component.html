@@ -8,8 +8,9 @@
   >
 </header>
 <div class="pills">
-  <button class="pill" [class.active]="!diet()" (click)="switchTab(false)">قوالب التدريب</button
-  ><button class="pill" [class.active]="diet()" (click)="switchTab(true)">
+  <button class="pill" [class.active]="!diet()" [disabled]="busy()" (click)="switchTab(false)">
+    قوالب التدريب</button
+  ><button class="pill" [class.active]="diet()" [disabled]="busy()" (click)="switchTab(true)">
     قوالب الأنظمة الغذائية
   </button>
 </div>
@@ -42,6 +43,14 @@
                 >تعديل</a
               ><button class="text-button" [disabled]="busy()" (click)="duplicate(template.id)">
                 إنشاء نسخة
+              </button>
+              <button
+                class="text-button"
+                type="button"
+                [disabled]="busy()"
+                (click)="remove(template)"
+              >
+                {{ 'planActions.deleteTemplate' | transloco }}
               </button>
             </div>
           </article>

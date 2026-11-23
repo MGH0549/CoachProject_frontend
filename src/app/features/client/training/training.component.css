@@ -99,6 +99,59 @@
 .video-card .btn {
   margin-block-start: 16px;
 }
+.exercise-row .last-weight,
+.exercise-row .new-best {
+  color: var(--green-text);
+  margin-block-start: 5px;
+}
+.close-sheet {
+  display: none;
+}
+@media (max-width: 767px) {
+  .video-card {
+    display: none;
+  }
+  .video-card.panel-open {
+    display: block;
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: 0;
+    inset-block-start: auto;
+    z-index: 101;
+    max-block-size: 88dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 20px 20px 0 0;
+    padding-block-end: calc(20px + env(safe-area-inset-bottom));
+  }
+  .close-sheet {
+    display: block;
+    margin-inline-start: auto;
+    background: transparent;
+    color: var(--text);
+    border: 0;
+    padding: 10px;
+  }
+  .sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: #0009;
+    z-index: 100;
+  }
+  .alternatives {
+    display: none;
+  }
+  .video-thumb {
+    width: 45px;
+    min-width: 35px;
+  }
+  .exercise-row {
+    gap: 8px;
+  }
+  .mobile-choices {
+    margin-block: 12px;
+  }
+}
 @media (max-width: 1000px) {
   .training-grid {
     grid-template-columns: 1fr;

@@ -1,0 +1,141 @@
+:host {
+  display: block;
+}
+.weight-sheet {
+  width: min(480px, calc(100vw - 32px));
+  max-height: 88dvh;
+  overflow-y: auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--bg);
+}
+h2 {
+  font-size: 22px;
+}
+.sheet-subtitle,
+.form-hint,
+.prefilled {
+  font-size: 11px;
+  margin-block: 8px 14px;
+}
+.coach-target {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 11px;
+  margin-block: 16px;
+}
+.coach-target strong {
+  color: var(--red-text);
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+}
+.set-columns {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 2fr) minmax(0, 1fr) 32px;
+  gap: 8px;
+  align-items: center;
+}
+.set-head {
+  font-size: 9px;
+  color: var(--muted);
+  margin-block: 12px 8px;
+}
+.set-rows {
+  display: grid;
+  gap: 8px;
+}
+.set-number {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--raised);
+  color: var(--red-text);
+  font-size: 11px;
+}
+input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+}
+input[aria-invalid='true'] {
+  border-color: var(--danger-text);
+}
+.remove-set {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  min-height: 44px;
+  font-size: 22px;
+}
+.add-set {
+  width: 100%;
+  margin-block: 12px;
+  min-height: 44px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--red-text);
+  font-size: 12px;
+}
+.prefilled {
+  color: var(--green-text);
+}
+.note-label {
+  display: block;
+  font-size: 12px;
+  margin-block: 12px 6px;
+}
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+.form-error {
+  color: var(--danger-text);
+  font-size: 12px;
+  margin-block: 10px;
+}
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-block-start: 20px;
+}
+.sheet-handle {
+  display: none;
+}
+@media (max-width: 760px) {
+  .weight-sheet {
+    width: 100vw;
+    border-radius: 20px 20px 0 0;
+    padding: 12px 18px max(18px, env(safe-area-inset-bottom));
+    max-height: 92dvh;
+  }
+  .sheet-handle {
+    display: block;
+    width: 34px;
+    height: 4px;
+    border-radius: 4px;
+    margin: 0 auto 18px;
+    background: var(--border);
+  }
+  .sheet-actions {
+    position: sticky;
+    inset-block-end: 0;
+    background: var(--bg);
+    padding-block-start: 10px;
+  }
+  .sheet-actions .btn {
+    flex: 1;
+  }
+}

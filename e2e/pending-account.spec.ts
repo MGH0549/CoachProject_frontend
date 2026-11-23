@@ -113,25 +113,43 @@ for (const status of ['Expired', 'Deactivated'] as const) {
   });
 }
 
-test('ACCESS_INACTIVE during a plan action rechecks /me and hides the plan without an error', async ({
-  page,
-}) => {
-  const state = await mockApi(page);
-  await page.goto('/client/training');
-  await expect(page.getByRole('heading', { name: 'يوم الدفع', exact: true })).toBeVisible();
-  let rejected = false;
-  await page.route('**/api/v1/me/workouts', (route) => {
-    rejected = true;
-    state.account.status = 'Expired';
-    return route.fulfill({ status: 403, json: { code: 'ACCESS_INACTIVE' } });
+for (const withWeights of [false, true]) {
+  test(`ACCESS_INACTIVE during a plan action rechecks /me and hides the plan without an error (${withWeights ? 'weights' : 'without weights'})`, async ({
+    page,
+  }) => {
+    const state = await mockApi(page);
+    await page.goto('/client/training');
+    await expect(page.getByRole('heading', { name: 'يوم الدفع', exact: true })).toBeVisible();
+    let rejected = false;
+    await page.route('**/api/v1/me/workouts', (route) => {
+      rejected = true;
+      state.account.status = 'Expired';
+      return route.fulfill({ status: 403, json: { code: 'ACCESS_INACTIVE' } });
+    });
+    await page.locator('.exercise-row').click();
+    if (withWeights) {
+      for (let number = 1; number <= 4; number++) {
+        await page
+          .getByRole('spinbutton', { name: `وزن المجموعة ${number} بالكيلوجرام`, exact: true })
+          .fill('20');
+        await page
+          .getByRole('spinbutton', { name: `تكرارات المجموعة ${number}`, exact: true })
+          .fill('8');
+      }
+    }
+    await page
+      .getByRole('button', {
+        name: withWeights ? 'حفظ الأوزان وإتمام التمرين' : 'إتمام التمرين بدون أوزان',
+        exact: true,
+      })
+      .click();
+    await expect(page.getByRole('heading', { name: 'انتهت مدة اشتراكك' })).toBeVisible();
+    expect(rejected).toBe(true);
+    await expect(page.locator('app-training')).toHaveCount(0);
+    await expect(page.locator('[role="alert"]')).toHaveCount(0);
+    await expect(page.locator('nav:visible .nav-lock')).toHaveCount(3);
+    state.account.status = 'Active';
+    await page.getByRole('button', { name: 'تم التفعيل؟ حدّث حالة حسابي' }).click();
+    await expect(page.getByRole('heading', { name: 'يوم الدفع', exact: true })).toBeVisible();
   });
-  await page.getByRole('button', { name: 'تسجيل إتمام التمرين', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'انتهت مدة اشتراكك' })).toBeVisible();
-  expect(rejected).toBe(true);
-  await expect(page.locator('app-training')).toHaveCount(0);
-  await expect(page.locator('[role="alert"]')).toHaveCount(0);
-  await expect(page.locator('nav:visible .nav-lock')).toHaveCount(3);
-  state.account.status = 'Active';
-  await page.getByRole('button', { name: 'تم التفعيل؟ حدّث حالة حسابي' }).click();
-  await expect(page.getByRole('heading', { name: 'يوم الدفع', exact: true })).toBeVisible();
-});
+}

@@ -1,0 +1,240 @@
+@if (loading()) {
+  <p class="empty" role="status">{{ 'strength.loading' | transloco }}</p>
+} @else if (error() === 'strength.loadError') {
+  <section class="card empty">
+    <p role="alert">{{ error() | transloco }}</p>
+    <button class="btn secondary" (click)="load()">{{ 'strength.retry' | transloco }}</button>
+  </section>
+} @else {
+  <div class="strength-toolbar">
+    <label for="strength-exercise">{{ 'strength.exercise' | transloco }}</label>
+    <select
+      id="strength-exercise"
+      #exerciseSelect
+      [value]="selectedId()"
+      (change)="selectedId.set(exerciseSelect.value)"
+    >
+      <optgroup [label]="'strength.lifts' | transloco">
+        @for (lift of data().lifts; track lift.exerciseId) {
+          <option [value]="lift.exerciseId">{{ lift.name }}</option>
+        }
+      </optgroup>
+      @if (historicalLifts().length) {
+        <optgroup [label]="'strength.previousPlan' | transloco">
+          @for (lift of historicalLifts(); track lift.exerciseId) {
+            <option [value]="lift.exerciseId">{{ lift.exerciseName }}</option>
+          }
+        </optgroup>
+      }
+    </select>
+    <button
+      type="button"
+      class="btn log-weights"
+      [disabled]="busy() || !planLift()?.canLog"
+      (click)="log()"
+    >
+      {{ 'strength.log' | transloco }}
+    </button>
+  </div>
+  <div class="strength-summary">
+    <article class="card">
+      <span>{{ 'strength.heaviest' | transloco }}</span><strong
+        ><bdi>{{ heaviest()?.bestWeightKg ?? '—' }}</bdi>
+        <small>{{ 'strength.kg' | transloco }}</small></strong
+      >
+      <p>{{ heaviest()?.exerciseName || '—' }}</p>
+    </article>
+    <article class="card">
+      <span>{{ 'strength.sessions' | transloco }}</span><strong
+        ><bdi>{{ data().sessions.length }}</bdi></strong
+      >
+      <p>{{ 'strength.sessionUnit' | transloco }}</p>
+    </article>
+    <article class="card">
+      <span>{{ 'strength.personalBests' | transloco }}</span><strong
+        ><bdi>{{ bestsThisMonth() }}</bdi></strong
+      >
+      <p class="positive">{{ 'strength.records' | transloco }}</p>
+    </article>
+  </div>
+  @if (!data().sessions.length) {
+    <section class="card empty-strength">
+      <h2>{{ 'strength.noLogsTitle' | transloco }}</h2>
+      <p>{{ 'strength.noLogsBody' | transloco }}</p>
+      @if (!data().lifts.length) {
+        <p>{{ 'strength.noPlan' | transloco }}</p>
+      }
+    </section>
+  }
+  @if (selected()) {
+    <div class="strength-layout">
+      <div class="strength-main">
+        <section class="card chart-card">
+          <div class="chart-heading">
+            <h2>
+              <bdi>{{ selected()?.exerciseName }}</bdi>
+            </h2>
+            @if (newBest()) {
+              <span class="new-best"
+                >{{ 'strength.newBest' | transloco }} · <bdi>{{ selected()?.bestWeightKg }}</bdi>
+                {{ 'strength.kg' | transloco }}</span
+              >
+            }
+          </div>
+          <div class="range-row">
+            <h3>{{ 'strength.chart' | transloco }}</h3>
+            <div
+              class="range-buttons"
+              role="group"
+              [attr.aria-label]="'strength.range' | transloco"
+            >
+              <button
+                type="button"
+                [class.active]="range() === '12w'"
+                [attr.aria-pressed]="range() === '12w'"
+                (click)="range.set('12w')"
+              >
+                {{ 'strength.weeks12' | transloco }}</button><button
+                type="button"
+                [class.active]="range() === 'all'"
+                [attr.aria-pressed]="range() === 'all'"
+                (click)="range.set('all')"
+              >
+                {{ 'strength.all' | transloco }}
+              </button>
+            </div>
+          </div>
+          @if (points().length) {
+            <div class="strength-chart" role="img" [attr.aria-label]="chartLabel()">
+              <svg viewBox="0 0 600 230" aria-hidden="true">
+                <path class="chart-grid" d="M25 30H575 M25 85H575 M25 140H575 M25 195H575" />
+                <path class="chart-area" [attr.d]="geometry().area" />
+                <path class="chart-line" [attr.d]="geometry().line" />
+                @for (point of geometry().coordinates; track $index) {
+                  <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4">
+                    <title>
+                      {{ dateLabel(points()[$index].at) }}: {{ points()[$index].weight }}
+                      {{ 'strength.kg' | transloco }}
+                    </title>
+                  </circle>
+                }
+              </svg>
+            </div>
+            <div class="chart-dates" dir="ltr">
+              <span>{{ dateLabel(points()[0].at) }}</span><span>{{
+                dateLabel(points()[points().length - 1].at)
+              }}</span>
+            </div>
+            <ul class="sr-only">
+              @for (point of points(); track point.id) {
+                <li>
+                  {{ dateLabel(point.at) }}: {{ point.weight }} {{ 'strength.kg' | transloco }}
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="empty">
+              {{ (sessions().length ? 'strength.noRange' : 'strength.emptyLift') | transloco }}
+            </p>
+          }
+        </section>
+        <section class="card sessions-card">
+          <div class="range-row">
+            <h2>{{ 'strength.recent' | transloco }}</h2>
+            <small>{{ 'strength.setsHint' | transloco }}</small>
+          </div>
+          @for (item of recent(); track item.id) {
+            <article class="session-row">
+              <div class="session-details">
+                <strong>{{ item.recordedAt | cairoDate }}</strong>
+                <div class="session-sets" dir="ltr">
+                  @for (set of item.sets; track set.setNumber) {
+                    <span>{{ set.weightKg }} × {{ set.repetitions }}</span>
+                  }
+                </div>
+                <span class="session-best"
+                  >{{ 'strength.best' | transloco }} <bdi>{{ sessionWeight(item) }}</bdi>
+                  {{ 'strength.kg' | transloco }}</span
+                >
+              </div>
+              @if (item.note) {
+                <p class="session-note">{{ item.note }}</p>
+              }
+              <div class="session-actions">
+                <button class="text-button" [disabled]="busy()" (click)="log(item)">
+                  {{ 'strength.edit' | transloco }}</button><button
+                  class="text-button"
+                  [disabled]="busy()"
+                  (click)="deleting.set(item.id)"
+                >
+                  {{ 'strength.delete' | transloco }}
+                </button>
+              </div>
+              @if (deleting() === item.id) {
+                <div class="delete-confirm">
+                  <p>{{ 'strength.confirmDelete' | transloco }}</p>
+                  <button class="btn" [disabled]="busy()" (click)="remove(item)">
+                    {{ 'strength.delete' | transloco }}</button><button
+                    class="btn secondary"
+                    [disabled]="busy()"
+                    (click)="deleting.set(null)"
+                  >
+                    {{ 'strength.cancel' | transloco }}
+                  </button>
+                </div>
+              }
+            </article>
+          } @empty {
+            <p>{{ 'strength.emptyLift' | transloco }}</p>
+          }
+          @if (recent().length < sessions().length) {
+            <button
+              type="button"
+              class="text-button"
+              (click)="visibleSessions.set(visibleSessions() + 5)"
+            >
+              {{ 'strength.moreSessions' | transloco }}
+            </button>
+          }
+        </section>
+      </div>
+      <aside class="card lifts-card">
+        <h2>{{ 'strength.lifts' | transloco }}</h2>
+        <p>{{ 'strength.liftsHint' | transloco }}</p>
+        @for (lift of data().overview; track lift.exerciseId) {
+          <button
+            class="lift-row"
+            [class.selected]="lift.exerciseId === selectedId()"
+            [attr.aria-pressed]="lift.exerciseId === selectedId()"
+            (click)="selectedId.set(lift.exerciseId)"
+          >
+            <span
+              ><strong
+                ><bdi>{{ lift.exerciseName }}</bdi></strong
+              ><small>{{ 'strength.best' | transloco }}</small></span
+            ><span
+              ><bdi>{{ lift.bestWeightKg ?? '—' }}</bdi> {{ 'strength.kg' | transloco
+              }}<small
+                [class.positive]="(changeFor(lift.exerciseId) ?? 0) > 0"
+                [class.negative]="(changeFor(lift.exerciseId) ?? 0) < 0"
+                >{{ 'strength.change' | transloco }}:
+                <bdi
+                  >{{ (changeFor(lift.exerciseId) ?? 0) > 0 ? '+' : ''
+                  }}{{ changeFor(lift.exerciseId) ?? '—' }}</bdi
+                ></small
+              ></span
+            >
+          </button>
+        }
+      </aside>
+    </div>
+    @if (!planLift()) {
+      <p class="form-hint">{{ 'strength.historical' | transloco }}</p>
+    } @else if (!planLift()?.canLog) {
+      <p class="form-hint">{{ 'strength.lockedChoice' | transloco }}</p>
+    }
+  }
+  @if (error()) {
+    <p role="alert">{{ error() | transloco }}</p>
+  }
+}

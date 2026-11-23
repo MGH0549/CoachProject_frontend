@@ -1,0 +1,123 @@
+<section class="weight-sheet" [attr.aria-busy]="busy() || loading()">
+  <div class="sheet-handle" aria-hidden="true"></div>
+  <h2 id="log-weights-title">
+    {{ (data.session ? 'strength.editTitle' : 'strength.sheetTitle') | transloco }}
+  </h2>
+  <p class="sheet-subtitle">
+    <bdi>{{ data.session?.exerciseName || data.lift?.name }}</bdi> · {{ data.lift?.dayName }} ·
+    {{ date | cairoDate }}
+  </p>
+  @if (data.lift; as lift) {
+    <div class="coach-target">
+      <strong>{{ 'strength.target' | transloco }}</strong>
+      <span
+        >{{ 'strength.sets' | transloco }} <bdi dir="ltr">{{ lift.sets }} × {{ lift.reps }}</bdi> ·
+        {{ 'strength.rest' | transloco: { seconds: lift.restSeconds } }}</span
+      >
+    </div>
+  }
+  @if (loading()) {
+    <p role="status">{{ 'strength.loading' | transloco }}</p>
+  } @else if (error() === 'strength.loadSheetError') {
+    <p role="alert">{{ error() | transloco }}</p>
+    <button class="btn secondary" type="button" (click)="load()">
+      {{ 'strength.retry' | transloco }}
+    </button>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <fieldset [disabled]="busy()">
+        <div class="set-columns set-head">
+          <span>{{ 'strength.setNumber' | transloco }}</span><span>{{
+            'strength.weight' | transloco
+          }}</span
+          ><span>{{ 'strength.repetitions' | transloco }}</span
+          ><span></span>
+        </div>
+        <div formArrayName="sets" class="set-rows">
+          @for (row of form.controls.sets.controls; track row; let index = $index) {
+            <div class="set-columns" [formGroupName]="index">
+              <span class="set-number" dir="ltr">{{ index + 1 }}</span>
+              <input
+                type="number"
+                formControlName="weightKg"
+                inputmode="decimal"
+                dir="ltr"
+                min="0"
+                max="500"
+                step="0.25"
+                [attr.aria-label]="'strength.weightLabel' | transloco: { number: index + 1 }"
+                [attr.aria-invalid]="row.controls.weightKg.touched && row.controls.weightKg.invalid"
+              />
+              <input
+                type="number"
+                formControlName="repetitions"
+                inputmode="numeric"
+                dir="ltr"
+                min="1"
+                max="100"
+                step="1"
+                [attr.aria-label]="'strength.repsLabel' | transloco: { number: index + 1 }"
+                [attr.aria-invalid]="
+                  row.controls.repetitions.touched && row.controls.repetitions.invalid
+                "
+              />
+              <button
+                class="remove-set"
+                type="button"
+                [disabled]="form.controls.sets.length === 1"
+                [attr.aria-label]="'strength.removeSet' | transloco: { number: index + 1 }"
+                (click)="removeSet(index)"
+              >
+                ×
+              </button>
+            </div>
+          }
+        </div>
+        <button
+          type="button"
+          class="add-set"
+          [disabled]="form.controls.sets.length >= maxSets()"
+          (click)="addSet()"
+        >
+          <span aria-hidden="true">+</span> {{ 'strength.addSet' | transloco }}
+        </button>
+        <p class="form-hint">{{ 'strength.remaining' | transloco: { count: maxSets() } }}</p>
+        @if (prefilled()) {
+          <p class="prefilled">✓ {{ 'strength.prefilled' | transloco }}</p>
+        }
+        @if (form.controls.sets.invalid && form.controls.sets.touched) {
+          <p class="form-error" role="alert">{{ 'strength.invalid' | transloco }}</p>
+        }
+        <label class="note-label" for="weight-note">{{ 'strength.note' | transloco }}</label>
+        <textarea
+          id="weight-note"
+          formControlName="note"
+          maxlength="3000"
+          rows="3"
+          [placeholder]="'strength.notePlaceholder' | transloco"
+        ></textarea>
+        @if (form.controls.note.invalid && form.controls.note.touched) {
+          <p class="form-error" role="alert">{{ 'strength.noteInvalid' | transloco }}</p>
+        }
+      </fieldset>
+      @if (error() || !maxSets()) {
+        <p class="form-error" role="alert">{{ error() || 'strength.dailyLimit' | transloco }}</p>
+      }
+      <div class="sheet-actions">
+        <button type="button" class="btn secondary" [disabled]="busy()" (click)="dialog.close()">
+          {{ 'strength.cancel' | transloco }}</button><button
+          class="btn"
+          type="submit"
+          [disabled]="busy() || !maxSets()"
+        >
+          {{ (busy() ? 'strength.saving' : 'strength.save') | transloco }}
+        </button>
+      </div>
+    </form>
+  }
+  @if (loading() || error() === 'strength.loadSheetError') {
+    <button type="button" class="btn secondary" (click)="dialog.close()">
+      {{ 'strength.cancel' | transloco }}
+    </button>
+  }
+</section>
