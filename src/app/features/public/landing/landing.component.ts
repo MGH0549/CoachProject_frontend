@@ -91,14 +91,20 @@ export class LandingComponent {
     { title: 'أفعّل حسابك', text: 'بعد الاتفاق، أفتح لك لوحة التحكم وأبني خطتك.' },
     { title: 'تدرّب مع شرح بالفيديو', text: 'افتح خطتك، شاهد فيديو كل تمرين، واتبع نظامك الغذائي.' },
   ];
-  readonly discountPercent = 50;
   readonly minimumSubscriptionMonths = 3;
   readonly subscriptionDurations = [
-    { months: 3, label: '3 أشهر' },
-    { months: 6, label: '6 أشهر' },
-    { months: 12, label: '12 شهراً' },
+    { months: 3, label: '3 شهور', price: 1500, originalPrice: 2000 },
+    { months: 6, label: '6 شهور', price: 3000, originalPrice: 4500 },
+    { months: 12, label: 'سنة كاملة', price: 5000, originalPrice: 8000 },
   ];
   readonly selectedPackageMonths = signal<Record<string, number>>({});
+
+  getPackageDuration(months: number) {
+    return (
+      this.subscriptionDurations.find((duration) => duration.months === months) ??
+      this.subscriptionDurations[0]
+    );
+  }
 
   selectPackageDuration(packageName: string, value: string): void {
     const months = Number(value);
@@ -111,7 +117,7 @@ export class LandingComponent {
     name: string;
     text: string;
     popular: boolean;
-    price: number;
+    priceSurcharge: number;
     currency: string;
     items: string[];
   }[] = [
@@ -119,7 +125,7 @@ export class LandingComponent {
       name: 'تدريب أونلاين',
       text: 'متابعة كاملة عن بُعد مع تسجيل أسبوعي للتقدم.',
       popular: false,
-      price:2998,
+      priceSurcharge: 0,
       currency: 'جنيه مصري',
       items: ['خطة تدريب شخصية', 'نظام غذائي بالماكروز', 'فيديو لكل تمرين', 'متابعة أسبوعية'],
     },
@@ -127,7 +133,7 @@ export class LandingComponent {
       name: 'تدريب هجين',
       text: 'خطة أونلاين مع جلسات منتظمة معي في الجيم.',
       popular: true,
-      price: 3998,
+      priceSurcharge: 500,
       currency: 'جنيه مصري',
       items: ['كل مزايا الأونلاين', 'جلسة شخصية شهرية', 'تصحيح الأداء مباشرة', 'أولوية دعم واتساب'],
     },
@@ -197,6 +203,12 @@ export class LandingComponent {
       src: 'images/results/result-11.jpg',
       name: 'التحول الحادى عشر',
       duration: '8 أسابيع',
+      alt: 'صور التحول الثالث قبل وبعد التدريب',
+    },
+    {
+      src: 'images/results/result-12.jpg',
+      name: 'التحول الثانى عشر',
+      duration: '4 أسابيع',
       alt: 'صور التحول الثالث قبل وبعد التدريب',
     },
   ];

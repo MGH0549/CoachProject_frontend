@@ -192,6 +192,7 @@
       <div class="three-columns packages">
         @for (package of packages; track package.name) {
           @let selectedMonths = selectedPackageMonths()[package.name] ?? minimumSubscriptionMonths;
+          @let selectedDuration = getPackageDuration(selectedMonths);
           <article class="card package" [class.popular]="package.popular">
             @if (package.popular) {
               <span class="popular-label">الأكثر اختياراً</span>
@@ -211,23 +212,24 @@
                   }
                 </select>
               </label>
-              <span class="discount-label">خصم {{ discountPercent }}%</span>
+              <span class="discount-label">
+                وفر {{ selectedDuration.originalPrice - selectedDuration.price | number: '1.0-0' }}
+                {{ package.currency }}
+              </span>
               <div class="duration-price" aria-live="polite" aria-atomic="true">
                 <span class="subscription-total">السعر الإجمالي لمدة {{ selectedMonths }} شهر</span>
                 <span class="original-price">
                   قبل الخصم:
                   <s>
                     {{
-                      package.price * (selectedMonths / minimumSubscriptionMonths) | number: '1.0-2'
+                      selectedDuration.originalPrice + package.priceSurcharge | number: '1.0-0'
                     }}
                     {{ package.currency }}
                   </s>
                 </span>
                 <span class="price">
                   {{
-                    package.price *
-                      (selectedMonths / minimumSubscriptionMonths) *
-                      (1 - discountPercent / 100) | number: '1.0-2'
+                    selectedDuration.price + package.priceSurcharge | number: '1.0-0'
                   }}
                   <small>{{ package.currency }} بعد الخصم</small>
                 </span>
