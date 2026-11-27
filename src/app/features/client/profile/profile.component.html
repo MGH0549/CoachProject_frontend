@@ -18,11 +18,13 @@
         </dd>
         <dt>واتساب</dt>
         <dd>
-          <bdi>{{ account.whatsapp }}</bdi>
+          <bdi>{{ account.whatsapp || '—' }}</bdi>
         </dd>
         <dt>الباقة</dt>
         <dd>{{ account.package || '—' }}</dd>
-        <dt>انتهاء الاشتراك</dt>
+        <dt>تاريخ بداية الاشتراك</dt>
+        <dd>{{ account.activatedAt | cairoDate }}</dd>
+        <dt>تاريخ انتهاء الاشتراك</dt>
         <dd>{{ account.accessEndAt | cairoDate }}</dd>
         <dt>تاريخ التسجيل</dt>
         <dd>{{ account.createdAt | cairoDate }}</dd>

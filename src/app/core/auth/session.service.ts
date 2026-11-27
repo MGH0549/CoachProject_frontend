@@ -114,7 +114,13 @@ export class SessionService {
     if (this.accountRequest) return this.accountRequest;
     this.accountRequest = firstValueFrom(this.client.clientControllerAccount())
       .then((account) => {
-        this.account.set(account);
+        // The client API uses accessEndsAt; coach/client models use accessEndAt.
+        const response = account as Account & { accessEndsAt?: string | null };
+        this.account.set(
+          'accessEndsAt' in response
+            ? { ...account, accessEndAt: response.accessEndsAt ?? null }
+            : account,
+        );
         this.accountUnavailable.set(false);
         // A 403 recovery stays blocked until an explicit successful status refresh.
         if (!this.inactiveRecovery) this.accessBlocked.set(false);

@@ -38,6 +38,25 @@ describe('Session initialization and persistent-login recovery', () => {
       return token;
     });
 
+  it('maps the client API subscription end date and keeps settings details', async () => {
+    succeed();
+    client.clientControllerAccount.mockReturnValue(
+      of({
+        ...account,
+        whatsapp: '+201234567890',
+        activatedAt: '2026-11-01T10:00:00Z',
+        accessEndsAt: '2027-01-01T21:59:59Z',
+      }),
+    );
+    const session = TestBed.inject(SessionService);
+    await session.restore();
+    expect(session.account()).toMatchObject({
+      whatsapp: '+201234567890',
+      activatedAt: '2026-11-01T10:00:00Z',
+      accessEndAt: '2027-01-01T21:59:59Z',
+    });
+  });
+
   it('shares startup work and waits for the account before becoming authenticated', async () => {
     succeed();
     const accountResponse = new Subject<Account>();
